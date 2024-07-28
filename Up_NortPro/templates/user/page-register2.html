@@ -48,27 +48,19 @@
           </div>
           <div class="body body-main">
             <p class="lead">Create an account</p>
-            <form class="form-auth-small m-t-20">
+            <form method="post" class="form-auth-small m-t-20" action="{%url 'register' %}" enctype="multipart/form-data">
+                {% csrf_token %}
               <div class="form-group">
-                <input
-                  type="text"
-                  class="form-control round"
-                  placeholder="Your Full Names" />
+                <input type="text" class="form-control round" placeholder="Your Full Names" />
               </div>
               <div class="form-group">
-                <input
-                  type="email"
-                  class="form-control round"
-                  placeholder="Your email" />
+                <input type="email" class="form-control round"  placeholder="Your email" />
               </div>
               <div class="form-group">
-                <input
-                  type="number"
-                  class="form-control round"
-                  placeholder="mobile number" />
+                <input type="number"  class="form-control round" placeholder="mobile number" />
               </div>
               <div class="form-group">
-               <label for="state">Select State:</label> -->
+               <label for="state">Select State:</label>
                                 <select class="state-lga" id="state" name="state" onchange="updateLocalGovernments(this.value)">
                                     <option value="">Select State</option>
                                     <option value="Abia">Abia</option>
@@ -109,74 +101,59 @@
                                     <option value="Yobe">Yobe</option>
                                     <option value="Zamfara">Zamfara</option>
                                 </select>
-                                <select class="form-control round" id="stateSelect" onchange="populateLGAs()">
-                                  <option value="">Select State</option>
-                                </select>
-              </div>
-              <div class="form-group">
-                                <select class="form-control round" id="lgaSelect" onchange="populateWards()">
-                                  <option value="">Select LGA</option>
-                                </select>
-              </div>
-              <div class="form-group">
-                
-              <select class="form-control round" id="wardSelect" onchange="populatePollingUnits()">
-                <option value="">Select Ward</option>
-              </select>
-              </div>
-              <div class="form-group">
-              <select class=" form-control round" id="pollingUnitSelect">
-                <option value="">Select Polling Unit</option>
-              </select>
+                                
               </div>
 
-              <!-- <div class="form-group"> -->
-                
-                <!-- <input
-                  type="option"
-                  class="form-control round"
-                  placeholder="Select your state" /> -->
-              <!-- </div> -->
-              <!-- <div class="form-group">
-              <input
-                  type="text"
-                  class="form-control round"
-                  placeholder="Enter your Ward name" />
+              <div class="form-group">
+                <label for="state">Select Lga:</label>
+                                 <select class="state-lga" id="state" name="state" onchange="updateLocalGovernments(this.value)">
+                                     <option value="">Select LGA</option>
+                                     <option value="Abia">Aba</option>
+                                     <option value="Adamawa">Umuahia</option>
+                                     <option value="Anambra">Umunneochi</option>
+                                     <option value="Akwa Ibom">Ngwa</option>
+                                  </select>
+               </div>
+
+               <div class="form-group">
+                <label for="state">Select Ward:</label>
+                                 <select class="state-lga" id="state" name="state" onchange="updateLocalGovernments(this.value)">
+                                     <option value="">Ariari</option>
+                                     <option value="Abia">Abay</option>
+                                     <option value="Adamawa">Aba1</option>
+                                     <option value="Anambra">Aba2</option>
+                                     <option value="Akwa Ibom">Aba3</option>
+                                  </select>
+               </div>
+
+               <div class="form-group">
+                <label for="state">Select Polling Unit:</label>
+                                 <select class="state-lga" id="state" name="state" onchange="updateLocalGovernments(this.value)">
+                                     <option value="">Isi Gate</option>
+                                     <option value="Abia">PHC Road</option>
+                                     <option value="Adamawa">Transformer</option>
+                                     <option value="Anambra">Stadium</option>
+                                     <option value="Akwa Ibom">Main market</option>
+                                  </select>
+               </div>
+
+              <div class="form-group">
+                <input type="file" class="form-control round" name="userimage" placeholder="Upload passport or selfie" />
               </div>
-              <div class="form-group">
-              <input
-                  type="text"
-                  class="form-control round"
-                  placeholder="Enter your Poling Unit" />
-              </div> -->
-              <!-- <div class="form-group">
-                <input
-                  type="password"
-                  class="form-control round"
-                  placeholder="Password" />
-            
-              </div> -->
-              <div class="form-group">
-                <input
-                    type="file"
-                    class="form-control round"
-                    placeholder="Upload passport or selfie" />
-                </div>
-              <button type="submit" class="btn btn-primary btn-round btn-block">
-                Register
-              </button>
+
+              <div class="form-group" >
+                <input type="password" class="form-control form-control-user" id="password" name="password" placeholder="Password" >
+              </div>
+              <div class="form-group" >
+                <input type="password" class="form-control form-control-user" id="confirm_password" name="confirm_password" placeholder="Confirm Password" >
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-round btn-block">Register</button>
             </form>
-            <!-- <div class="separator-linethrough"><span>OR</span></div>
-            <button class="btn btn-round btn-signin-social">
-               Sign in
-            </button>
-            
-          </div> -->
+
         </div>
       </div>
      
-      
-      
     </div>
     </div>
     <script src="../assets/vendor/jquery/jquery-3.3.1.min.js"></script>

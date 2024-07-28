@@ -80,7 +80,7 @@ WSGI_APPLICATION = 'Up_NortPro.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': BASE_DIR / 'db2.sqlite3',
     }
 }
 
@@ -151,5 +151,5 @@ EMAIL_HOST = 'smtp.gmail.com'  # Replace with your SMTP host
 EMAIL_PORT =  465  # Replace with your SMTP port
 EMAIL_USE_SSL = True
 # EMAIL_USE_TLS = True  # Use TLS encryption for security
-EMAIL_HOST_USER = ''  # Replace with your email address
-EMAIL_HOST_PASSWORD = ''
+EMAIL_HOST_USER = 'joshlove00001@gmail.com'  # Replace with your email address
+EMAIL_HOST_PASSWORD = 'skerhljtkfkttxqq'

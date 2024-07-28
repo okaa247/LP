@@ -5,24 +5,24 @@ from .models import *
 
 @admin.register(UserRegistration)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('username', 'email', 'phone_number', 'created_at')
+    list_display = ('username', 'email', 'is_email_verified', 'phone_number', 'created_at')
 
 
-# @admin.register(National)
-# class NationalAdmin(admin.ModelAdmin):
-#     list_display = ('name', 'user', 'state', 'lga', 'ward', 'membership_status', 'created_at', 'updated_at')
+@admin.register(National)
+class NationalAdmin(admin.ModelAdmin):
+    list_display = ('name', 'user', 'state', 'lga', 'ward', 'membership_status', 'created_at', 'updated_at')
     
-# @admin.register(State)
-# class StateAdmin(admin.ModelAdmin):
-#     list_display = ('name', 'created_at', 'updated_at')
+@admin.register(State)
+class StateAdmin(admin.ModelAdmin):
+    list_display = ('name', 'created_at', 'updated_at')
 
-# @admin.register(LGA)
-# class LGAAdmin(admin.ModelAdmin):
-#     list_display = ('name', 'user', 'ward', 'created_at', 'updated_at')
+@admin.register(LGA)
+class LGAAdmin(admin.ModelAdmin):
+    list_display = ('name', 'user', 'ward', 'created_at', 'updated_at')
 
-# @admin.register(Ward)
-# class WardAdmin(admin.ModelAdmin):
-#     list_display = ('name', 'user', 'created_at', 'updated_at')
+@admin.register(Ward)
+class WardAdmin(admin.ModelAdmin):
+    list_display = ('name', 'user', 'created_at', 'updated_at')
 
    
 

@@ -20,6 +20,8 @@ from .models import *
 from django.utils import timezone
 from datetime import timedelta
 
+User = get_user_model()
+
 # from django.contrib.auth.tokens import default_token_generator
 # from django.utils.http import urlsafe_base64_encode
 # from django.utils.http import urlsafe_base64_decode
@@ -30,20 +32,18 @@ from datetime import timedelta
 
 class Signup(View):
     def get(self, request):
-        return render(request, 'user/page-register.html')
+        return render(request, 'user/signup.html')
 
     def post(self, request):
         email = request.POST['email']
         username = request.POST['username']
-        first_name = request.POST['first_name']
-        last_name = request.POST['last_name']
         
         if User.objects.filter(email=email).exists():
             messages.error(request, 'Email already exists')
         if User.objects.filter(username=username).exists():
             messages.error(request, 'Username already exist')
 
-        user = User.objects.create_user(email=email, username=username, first_name=first_name, last_name=last_name)
+        user = User.objects.create_user(email=email, username=username)
 
         generate_verification = random.randint(100000, 999999)
         user.otp = generate_verification
@@ -60,15 +60,45 @@ class Signup(View):
             messages.success(request, 'Successfully sent OTP. Verify your email here.')
             return redirect('verifyit')
         messages.error(request, 'Sign up')
-        return render(request, 'user/page-signup.html')
+        return render(request, 'user/signup.html')
+
+
+# class Verify(View):
+#     def get(self, request):
+#         return render(request, 'user/verify.html')
+    
+#     def post(self, request):
+#         entered_otp = request.POST['otp']
+#         try:
+#             user = User.objects.get(otp=entered_otp, is_email_verified=False)
+#             if user.otp_created_at >= timezone.now() - timedelta(minutes=5):
+#                 user.is_email_verified = True
+#                 user.save()
+#                 login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+#                 messages.success(request, 'Success, You are logged in. Create your account here.')
+#                 return redirect('registerit')
+#             else:
+#                 messages.error(request, 'Ooops! OTP expired.')
+#                 return redirect('reverifyit')
+#         except User.DoesNotExist:
+#             messages.error(request, 'User not found, signup.')
+#             return redirect('signup')
+        
+
+
+
 
 
 class Verify(View):
     def get(self, request):
         return render(request, 'user/verify.html')
-
+    
     def post(self, request):
-        entered_otp = request.POST['otp']
+        entered_otp = request.POST.get('otp')
+        if not entered_otp:
+            messages.error(request, 'Please enter the OTP.')
+            return redirect('reverifyit')
+        
         try:
             user = User.objects.get(otp=entered_otp, is_email_verified=False)
             if user.otp_created_at >= timezone.now() - timedelta(minutes=5):
@@ -81,9 +111,11 @@ class Verify(View):
                 messages.error(request, 'Ooops! OTP expired.')
                 return redirect('reverifyit')
         except User.DoesNotExist:
-            messages.error(request, 'User not found, signup.')
+            messages.error(request, 'Invalid OTP or user not found. Please sign up.')
             return redirect('signup')
-        
+
+
+
 
 class ReverifyOtp(View):
     def get(self, request):
@@ -126,7 +158,7 @@ class Register(View):
         if not request.user.is_authenticated:
             messages.error(request, 'User not authenticated')
             return redirect('reverifyit')
-        return render(request, 'user/page-register.html')
+        return render(request, 'user/page-register2.html')
     
     def post(self, request):
         if not request.user.is_authenticated:
@@ -139,13 +171,13 @@ class Register(View):
         entered_username = request.POST.get('username')
         entered_email = request.POST.get('email')
 
-        fullname = request.POST.get['fullname']
-        phone_number = request.POST.get['phone_number']
-        state = request.POST.get['state']
-        lga = request.POST.get['lga']
-        ward = request.POST.get['ward']
-        pollingunit = request.POST.get['pollingunit']
-        userimage = request.POST.get['FILE']
+        fullname = request.POST.get('fullname')
+        phone_number = request.POST.get('phone_number')
+        state = request.POST.get('state')
+        lga = request.POST.get('lga')
+        ward = request.POST.get('ward')
+        pollingunit = request.POST.get('pollingunit')
+        userimage = request.FILES.get('userimage')
         password = request.POST.get('password')
         confirm_password = request.POST.get('confirm_password')
 
@@ -185,20 +217,20 @@ class Register(View):
 
 
 
-# class LoginView(View):
-#     def get(self, request):
-#         return render(request, 'login.html')
+class LoginView(View):
+    def get(self, request):
+        return render(request, 'login.html')
 
-#     def post(self, request):
-#         username = request.POST.get('username')
-#         password = request.POST.get('password')
+    def post(self, request):
+        username = request.POST.get('username')
+        password = request.POST.get('password')
 
-#         user = authenticate(request, username=username, password=password)
-#         if user is not None:
-#             login(request, user)
-#             return redirect('home')  # Redirect to a success page or home
-#         else:
-#             return render(request, 'login.html', {'error': 'Invalid credentials'})
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('home')  # Redirect to a success page or home
+        else:
+            return render(request, 'login.html', {'error': 'Invalid credentials'})
 
 
 class Home(View):
