@@ -22,12 +22,7 @@ from datetime import timedelta
 
 User = get_user_model()
 
-# from django.contrib.auth.tokens import default_token_generator
-# from django.utils.http import urlsafe_base64_encode
-# from django.utils.http import urlsafe_base64_decode
-# from django.utils.encoding import force_bytes, force_str
-# from django.core.exceptions import MultipleObjectsReturned
-# from django.contrib.auth.backends import ModelBackend
+
 
 
 class Signup(View):
@@ -58,32 +53,9 @@ class Signup(View):
         
         if send_now:
             messages.success(request, 'Successfully sent OTP. Verify your email here.')
-            return redirect('verifyit')
+            return redirect('verify')
         messages.error(request, 'Sign up')
         return render(request, 'user/signup.html')
-
-
-# class Verify(View):
-#     def get(self, request):
-#         return render(request, 'user/verify.html')
-    
-#     def post(self, request):
-#         entered_otp = request.POST['otp']
-#         try:
-#             user = User.objects.get(otp=entered_otp, is_email_verified=False)
-#             if user.otp_created_at >= timezone.now() - timedelta(minutes=5):
-#                 user.is_email_verified = True
-#                 user.save()
-#                 login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-#                 messages.success(request, 'Success, You are logged in. Create your account here.')
-#                 return redirect('registerit')
-#             else:
-#                 messages.error(request, 'Ooops! OTP expired.')
-#                 return redirect('reverifyit')
-#         except User.DoesNotExist:
-#             messages.error(request, 'User not found, signup.')
-#             return redirect('signup')
-        
 
 
 
@@ -97,7 +69,7 @@ class Verify(View):
         entered_otp = request.POST.get('otp')
         if not entered_otp:
             messages.error(request, 'Please enter the OTP.')
-            return redirect('reverifyit')
+            return redirect('reverify')
         
         try:
             user = User.objects.get(otp=entered_otp, is_email_verified=False)
@@ -106,10 +78,10 @@ class Verify(View):
                 user.save()
                 login(request, user, backend='django.contrib.auth.backends.ModelBackend')
                 messages.success(request, 'Success, You are logged in. Create your account here.')
-                return redirect('registerit')
+                return redirect('register')
             else:
                 messages.error(request, 'Ooops! OTP expired.')
-                return redirect('reverifyit')
+                return redirect('reverify')
         except User.DoesNotExist:
             messages.error(request, 'Invalid OTP or user not found. Please sign up.')
             return redirect('signup')
@@ -129,7 +101,7 @@ class ReverifyOtp(View):
             user = User.objects.get(email=entered_email, is_email_verified=False)
         except User.DoesNotExist:
             messages.error(request, 'Invalid email address.')
-            return redirect('reverifyit')
+            return redirect('reverify')
 
         
         new_otp = random.randint(100000, 999999)
@@ -145,10 +117,10 @@ class ReverifyOtp(View):
 
         if send_now:
             messages.success(request, 'New OTP sent successfully.')
-            return redirect('verifyit')  # Redirect to the OTP verification page
+            return redirect('verify')  # Redirect to the OTP verification page
         else:
             messages.error(request, 'Failed to send new OTP.')
-            return redirect('reverifyit')
+            return redirect('reverify')
 
 
 
@@ -157,13 +129,13 @@ class Register(View):
     def get(self, request):
         if not request.user.is_authenticated:
             messages.error(request, 'User not authenticated')
-            return redirect('reverifyit')
+            return redirect('reverify')
         return render(request, 'user/page-register2.html')
     
     def post(self, request):
         if not request.user.is_authenticated:
             messages.error(request, 'User not authenticated')
-            return redirect('reverifyit')
+            return redirect('reverify')
          
         # Retrieve the logged-in user 
         user = request.user
@@ -222,10 +194,10 @@ class LoginView(View):
         return render(request, 'login.html')
 
     def post(self, request):
-        username = request.POST.get('username')
+        email = request.POST.get('email')
         password = request.POST.get('password')
 
-        user = authenticate(request, username=username, password=password)
+        user = authenticate(request, email=email, password=password)
         if user is not None:
             login(request, user)
             return redirect('home')  # Redirect to a success page or home

@@ -3,7 +3,9 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.utils import timezone
 from shortuuidfield import ShortUUIDField
-from django.contrib.auth.models import User 
+from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver 
 
 # Create your models here.
 
@@ -53,11 +55,11 @@ class UserRegistration(AbstractUser):
 
 
 
-    
-    
+
+
 class Ward(models.Model):
     name = models.CharField(max_length=255)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+    user = models.ForeignKey(UserRegistration, on_delete=models.CASCADE, related_name='wards', blank=True, null=True)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
     ROLE_CHOICES = [
@@ -68,15 +70,23 @@ class Ward(models.Model):
         ('ward_treasurer', 'Ward Treasurer'),
     ]
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='dormant')
-  
+
     def __str__(self):
         return self.name
-    
+
+
+@receiver(post_save, sender=UserRegistration)
+def update_ward_role(sender, instance, **kwargs):
+    if instance.user_status == 'approved':
+        # Update the related Ward instance(s)
+        Ward.objects.filter(user=instance).update(role='active')
+
+
 
 
 class LGA(models.Model):
     name = models.CharField(max_length=255)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+    user = models.ForeignKey(UserRegistration, on_delete=models.CASCADE, related_name='lgward', blank=True, null=True)
     ward = models.ForeignKey(Ward, on_delete=models.CASCADE, related_name='lgaward', null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
@@ -93,9 +103,10 @@ class LGA(models.Model):
         return self.name
     
 
+
 class State(models.Model):
     name = models.CharField(max_length=255)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+    user = models.ForeignKey(UserRegistration, on_delete=models.CASCADE, related_name='statewards', blank=True, null=True)
     ward = models.ForeignKey(Ward, on_delete=models.CASCADE, related_name='stateward', null=True)
     lga = models.ForeignKey(LGA, on_delete=models.CASCADE, related_name='statelga', null=True)
     created_at = models.DateTimeField(default=timezone.now)
@@ -108,7 +119,6 @@ class State(models.Model):
         ('state_coordinator', 'State Coordinator'),
         ('state_secretary', 'State Secretary'),
         ('state_treasurer', 'State Treasurer'),
-        
     ]
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='active')
 
@@ -122,9 +132,10 @@ status = [
     ]
 
 
+
 class National(models.Model):
     name = models.CharField(max_length=255)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+    user = models.ForeignKey(UserRegistration, on_delete=models.CASCADE, related_name='natwards', blank=True, null=True)
     state = models.ForeignKey(State, on_delete=models.CASCADE, related_name='natstate', null=True)
     lga = models.ForeignKey(LGA, on_delete=models.CASCADE, related_name='natlgs', null=True)
     ward = models.ForeignKey(Ward, on_delete=models.CASCADE, related_name='natward', null=True)
@@ -134,6 +145,21 @@ class National(models.Model):
     
     def __str__(self):
         return self.name
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -152,6 +178,7 @@ class National(models.Model):
 #         return f"{self.user.username} - {self.ward.name}"
 
 
+
 # class Role(models.Model):
 #     role_name = models.CharField(max_length=255)
 #     created_at = models.DateTimeField(default=timezone.now)
@@ -159,6 +186,7 @@ class National(models.Model):
 
 #     def __str__(self):
 #         return self.role_name
+
 
 
 # class UserRole(models.Model):
@@ -205,8 +233,6 @@ class National(models.Model):
 
 
 
-
-
 # class Incident(models.Model):
 #     STATUS_CHOICES = [
 #         ('pending', 'Pending'),
@@ -222,5 +248,7 @@ class National(models.Model):
 
 #     def __str__(self):
 #         return self.title
+
+
 
 

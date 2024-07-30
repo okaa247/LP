@@ -153,3 +153,6 @@ EMAIL_USE_SSL = True
 # EMAIL_USE_TLS = True  # Use TLS encryption for security
 EMAIL_HOST_USER = 'joshlove00001@gmail.com'  # Replace with your email address
 EMAIL_HOST_PASSWORD = 'skerhljtkfkttxqq'
+
+
+AUTH_USER_MODEL = 'Registration.UserRegistration'
