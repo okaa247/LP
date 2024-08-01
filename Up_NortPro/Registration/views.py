@@ -171,18 +171,31 @@ class Register(View):
                 return redirect('register')
         else:
             messages.warning(request, 'No password provided')
-            return redirect('register')      
-        user = UserRegistration.objects.create(
-            fullname= fullname,
-            phone_number=phone_number,
-            state=state,
-            lga=lga,
-            ward=ward,
-            pollingunit=pollingunit,
-            userimage=userimage
-        )
+            return redirect('register')
+
+        user.fullname = fullname
+        user.phone_number = phone_number
+        user.state = state
+        user.lga = lga
+        user.ward = ward
+        user.pollingunit = pollingunit
+        user.userimage = userimage
         user.save()
+
+        messages.success(request, 'Registration successfully')
         return redirect('login')
+
+        # user = User.objects.create(
+        #     fullname= fullname,
+        #     phone_number=phone_number,
+        #     state=state,
+        #     lga=lga,
+        #     ward=ward,
+        #     pollingunit=pollingunit,
+        #     userimage=userimage
+        # )
+        # user.save()
+        # return redirect('login')
       
 
 
@@ -203,6 +216,7 @@ class LoginView(View):
             return redirect('home')  # Redirect to a success page or home
         else:
             return render(request, 'login.html', {'error': 'Invalid credentials'})
+
 
 
 class Home(View):
