@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Ward</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h2>Create Ward</h2>
+    <form method="post" id="createWardForm">
+        {% csrf_token %}
+        {% include "messages/message.html" %}
+        {% comment %} <label for="name">Ward Name:</label>
+        <input type="text" id="name" name="name" required><br><br> {% endcomment %}
+        
+        <label for="role">Role:</label>
+        <select id="role" name="role">
+            <option value="dormant">Dormant</option>
+            <option value="active">Active</option>
+            <option value="ward_leader">Ward Leader</option>
+            <option value="ward_secretary">Ward Secretary</option>
+            <option value="ward_treasurer">Ward Treasurer</option>
+        </select><br><br>
+        
+        <label for="membership_id">Membership ID:</label>
+        <input type="text" id="membership_id" name="membership_id" required><br><br>
+
+        <label for="fullname">Fullname:</label>
+        <input type="text" id="fullname" name="fullname" readonly><br><br>
+        
+        <button type="submit">Create Ward</button>
+    </form>
+
+    <script>
+        $(document).ready(function() {
+            $('#membership_id').on('change', function() {
+                var membership_id = $(this).val();
+                if (membership_id) {
+                    $.ajax({
+                        url: "{% url 'get_user_info' %}",
+                        data: {
+                            'membership_id': membership_id
+                        },
+                        success: function(data) {
+                            if (data.fullname) {
+                                $('#fullname').val(data.fullname);
+                            } else {
+                                $('#fullname').val('');
+                                alert('No user found with this Membership ID.');
+                            }
+                        }
+                    });
+                } else {
+                    $('#fullname').val('');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

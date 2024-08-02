@@ -8,4 +8,15 @@ urlpatterns = [
     path('verifier/', Verify.as_view(), name='verify'),
     path('reverify/', ReverifyOtp.as_view(), name='reverify'),
     path('login/', LoginView.as_view(), name='login'),
+
+
+    path('wards/create/', CreateWard.as_view(), name='create_ward'),
+    path('wards/get_user_info/', GetUserInfo.as_view(), name='get_user_info'),
+
+
+    path('wards/create/', CreateWardMembershipView.as_view(), name='create-ward-membership'),
+
 ]
+
+
+

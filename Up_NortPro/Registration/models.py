@@ -56,10 +56,21 @@ class UserRegistration(AbstractUser):
 
 
 
-
 class Ward(models.Model):
-    name = models.CharField(max_length=255)
-    user = models.ForeignKey(UserRegistration, on_delete=models.CASCADE, related_name='wards', blank=True, null=True)
+    name = models.CharField(max_length=100, null=True)
+    chapter_registered = models.BooleanField(default=False)
+    created_at = models.DateTimeField(default=timezone.now)
+    members = models.ManyToManyField(UserRegistration, through='WardMembership', related_name='myward')
+    
+    def __str__(self):
+        return self.name
+
+
+
+class WardMembership(models.Model):
+    user = models.ForeignKey(UserRegistration, on_delete=models.CASCADE)
+    ward = models.ForeignKey(Ward, on_delete=models.CASCADE)
+    membership_id = models.CharField(max_length=100)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
     ROLE_CHOICES = [
@@ -69,30 +80,70 @@ class Ward(models.Model):
         ('ward_secretary', 'Ward Secretary'),
         ('ward_treasurer', 'Ward Treasurer'),
     ]
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='dormant')
+    role = models.CharField(max_length=50, choices=ROLE_CHOICES, default='dormant')
 
     def __str__(self):
-        return self.name
+        return f'{self.user} - {self.ward} - {self.role}'
 
 
 @receiver(post_save, sender=UserRegistration)
-def update_ward_role(sender, instance, **kwargs):
+def create_ward_membership(sender, instance, created, **kwargs):
     if instance.user_status == 'approved':
-        # Update the related Ward instance(s)
-        Ward.objects.filter(user=instance).update(role='active')
+        WardMembership.objects.get_or_create(
+            user=instance,
+            membership_id=instance.membership_id,
+            defaults={'ward': Ward.objects.first()}  # Adjust as necessary
+        )
+
+
+
+# class Ward(models.Model):
+#     user = models.ForeignKey(UserRegistration, on_delete=models.CASCADE, related_name='wards')
+#     fullname = models.CharField(max_length=200, blank=True, null=True)
+#     membership_id = models.CharField(max_length=20, blank=True, null=True)
+#     created_at = models.DateTimeField(default=timezone.now)
+#     updated_at = models.DateTimeField(auto_now=True)
+#     ROLE_CHOICES = [
+#         ('dormant', 'Dormant'),
+#         ('active', 'Active'),
+#         ('ward_leader', 'Ward Leader'),
+#         ('ward_secretary', 'Ward Secretary'),
+#         ('ward_treasurer', 'Ward Treasurer'),
+#     ]
+#     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='dormant')
+
+#     def __str__(self):
+#         return self.role
+
+#     def save(self, *args, **kwargs):
+#         if self.membership_id:
+#             try:
+#                 user = UserRegistration.objects.get(membership_id=self.membership_id)
+#                 self.user = user
+#                 self.fullname = user.fullname
+#             except UserRegistration.DoesNotExist:
+#                 raise ValueError("User with this membership ID does not exist")
+#         super().save(*args, **kwargs)
+
 
 
 
 
 class LGA(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=100)
+    wards = models.ManyToManyField(Ward)
+    created_at = models.DateTimeField(default=timezone.now)
+
+class LGAMembership(models.Model):
     user = models.ForeignKey(UserRegistration, on_delete=models.CASCADE, related_name='lgward', blank=True, null=True)
-    ward = models.ForeignKey(Ward, on_delete=models.CASCADE, related_name='lgaward', null=True, blank=True)
+    lga = models.ForeignKey(LGA, on_delete=models.CASCADE)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
     ROLE_CHOICES = [
         ('active', 'Active'),
         ('ward_leader', 'Ward Leader'),
+        ('ward_secretary', 'Ward Secretary'),
+        ('ward_treasurer', 'Ward Treasurer'),
         ('lga_coordinator', 'LGA Coordinator'),
         ('lga_secretary', 'LGA Secretary'),
         ('lga_treasurer', 'LGA Treasurer'),
@@ -100,22 +151,28 @@ class LGA(models.Model):
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='active')
 
     def __str__(self):
-        return self.name
+        return self.user.fullname
     
 
 
 class State(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=100)
+    lgas = models.ManyToManyField(LGA)
+    created_at = models.DateTimeField(default=timezone.now)
+
+class StateMembership(models.Model):
     user = models.ForeignKey(UserRegistration, on_delete=models.CASCADE, related_name='statewards', blank=True, null=True)
-    ward = models.ForeignKey(Ward, on_delete=models.CASCADE, related_name='stateward', null=True)
-    lga = models.ForeignKey(LGA, on_delete=models.CASCADE, related_name='statelga', null=True)
+    state = models.ForeignKey(State, on_delete=models.CASCADE)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
-   
     ROLE_CHOICES = [
         ('active', 'Active'),
         ('ward_leader', 'Ward Leader'),
+        ('ward_secretary', 'Ward Secretary'),
+        ('ward_treasurer', 'Ward Treasurer'),
         ('lga_coordinator', 'LGA Coordinator'),
+        ('lga_secretary', 'LGA Secretary'),
+        ('lga_treasurer', 'LGA Treasurer'),
         ('state_coordinator', 'State Coordinator'),
         ('state_secretary', 'State Secretary'),
         ('state_treasurer', 'State Treasurer'),
@@ -123,28 +180,39 @@ class State(models.Model):
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='active')
 
     def __str__(self):
-        return self.name
+        return self.user.fullname
     
     
-status = [
-        ('approve', 'Approved'),
-        ('pending', 'pending'),
-    ]
 
 
 
 class National(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=100)
+    states = models.ManyToManyField(State)
+
+class NationalMembership(models.Model):
     user = models.ForeignKey(UserRegistration, on_delete=models.CASCADE, related_name='natwards', blank=True, null=True)
-    state = models.ForeignKey(State, on_delete=models.CASCADE, related_name='natstate', null=True)
-    lga = models.ForeignKey(LGA, on_delete=models.CASCADE, related_name='natlgs', null=True)
-    ward = models.ForeignKey(Ward, on_delete=models.CASCADE, related_name='natward', null=True)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
-    membership_status = models.CharField(choices=status,max_length=50, default='pending')
+    ROLE_CHOICES = [
+        ('active', 'Active'),
+        ('ward_leader', 'Ward Leader'),
+        ('ward_secretary', 'Ward Secretary'),
+        ('ward_treasurer', 'Ward Treasurer'),
+        ('lga_coordinator', 'LGA Coordinator'),
+        ('lga_secretary', 'LGA Secretary'),
+        ('lga_treasurer', 'LGA Treasurer'),
+        ('state_coordinator', 'State Coordinator'),
+        ('state_secretary', 'State Secretary'),
+        ('state_treasurer', 'State Treasurer'),
+        ('national_coordinator', 'National Coordinator'),
+        ('national_secretary', 'National Secretary'),
+        ('national_treasurer', 'National Treasurer'),
+    ]
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='active')
     
     def __str__(self):
-        return self.name
+        return self.user.fullname
 
 
 

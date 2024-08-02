@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Update Ward</title>
+</head>
+<body>
+    <h1>Update Ward</h1>
+    <form method="post">
+        {% csrf_token %}
+        {% comment %} <label for="name">Name:</label>
+        <input type="text" id="name" name="name" value="{{ ward.name }}"><br><br> {% endcomment %}
+        <label for="role">Role:</label>
+        <select id="role" name="role">
+            <option value="dormant" {% if ward.role == 'dormant' %}selected{% endif %}>Dormant</option>
+            <option value="active" {% if ward.role == 'active' %}selected{% endif %}>Active</option>
+            <option value="ward_leader" {% if ward.role == 'ward_leader' %}selected{% endif %}>Ward Leader</option>
+            <option value="ward_secretary" {% if ward.role == 'ward_secretary' %}selected{% endif %}>Ward Secretary</option>
+            <option value="ward_treasurer" {% if ward.role == 'ward_treasurer' %}selected{% endif %}>Ward Treasurer</option>
+        </select><br><br>
+        <label for="membership_id">Membership ID:</label>
+        <input type="text" id="membership_id" name="membership_id" value="{{ ward.membership_id }}"><br><br>
+        <button type="submit">Update Ward</button>
+    </form>
+    <a href="{% url 'ward_list' %}">Back to Ward List</a>
+</body>
+</html>

@@ -4,7 +4,7 @@ from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView
 from django.contrib.auth import get_user_model
 from .models import *
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
 from django.views import View
 from django.contrib import messages
@@ -19,8 +19,16 @@ from django.contrib import messages, auth
 from .models import *
 from django.utils import timezone
 from datetime import timedelta
+from django.db.utils import IntegrityError
+from django.http import JsonResponse
+
+
+from django.db import transaction, IntegrityError
+from .models import Ward, UserRegistration as User
 
 User = get_user_model()
+
+
 
 
 
@@ -185,20 +193,7 @@ class Register(View):
         messages.success(request, 'Registration successfully')
         return redirect('login')
 
-        # user = User.objects.create(
-        #     fullname= fullname,
-        #     phone_number=phone_number,
-        #     state=state,
-        #     lga=lga,
-        #     ward=ward,
-        #     pollingunit=pollingunit,
-        #     userimage=userimage
-        # )
-        # user.save()
-        # return redirect('login')
       
-
-
 
 
 
@@ -228,31 +223,127 @@ class Home(View):
 
 
 
-# class RegistrationView(View):
-#     def get(self, request):
-#         return render(request, 'register.html')
 
-#     def post(self, request):
-#         email = request.POST['email']
-#         username = request.POST['username']
-#         fullname = request.POST['fullname']
-#         password = request.POST['password']
-#         phone_number = request.POST['phone_number']
-    
-#         if User.objects.filter(email=email).exists():
-#             messages.error(request, 'Email already exists')
-#             return redirect('register')
-#         if User.objects.filter(username=username).exists():
-#             messages.error(request, 'Username alradey exists')
-#             return redirect('register')
 
-#         user = User.objects.create_user(
-#             email=email,
-#             username=username,
-#             fullname=fullname,
-#             phone_number=phone_number,
-#             password=password
-#         )
-#         user.save()
-#         return redirect('login')
+
+
+
+
+
+
+
+
+
+
+
+
+
+class GetUserInfo(View):
+    def get(self, request):
+        membership_id = request.GET.get('membership_id')
+        try:
+            user = User.objects.get(membership_id=membership_id)
+            data = {
+                'fullname': user.fullname,
+            }
+        except User.DoesNotExist:
+            data = {
+                'fullname': None,
+            }
+        return JsonResponse(data)
+
+class CreateWard(View):
+    def get(self, request):
+        return render(request, 'ward/create_ward.html')
+
+    @transaction.atomic
+    def post(self, request):
+        role = request.POST.get('role')
+        membership_id = request.POST.get('membership_id')
+
+        if not membership_id:
+            messages.error(request, 'Name and Membership ID are required.')
+            return render(request, 'ward/create_ward.html')
+
+        try:
+            user = User.objects.get(membership_id=membership_id)
+
+            # Debugging: Print user information and input data
+            print(f"User: {user}")
+            print(f"Role: {role}, Membership ID: {membership_id}")
+
+            # Check if the user exists before creating the ward
+            if not user:
+                messages.error(request, 'User with this Membership ID does not exist.')
+                return render(request, 'ward/create_ward.html')
+
+            # Ensure data integrity with atomic transaction
+            with transaction.atomic():
+                ward = Ward.objects.create(
+                    role=role,
+                    user=user,
+                    fullname=user.fullname,
+                    membership_id=membership_id,
+                    created_at=timezone.now(),
+                    updated_at=timezone.now()
+                )
+                ward.save()
+
+            messages.success(request, 'Ward created successfully.')
+            return redirect('ward_list')
+        except User.DoesNotExist:
+            messages.error(request, 'User with this Membership ID does not exist.')
+            return render(request, 'ward/create_ward.html')
+        except IntegrityError as e:
+            messages.error(request, f'Integrity Error: {e}')
+            return render(request, 'ward/create_ward.html')
+        except Exception as e:
+            messages.error(request, f'Unexpected Error: {e}')
+            return render(request, 'ward/create_ward.html')
+
+
+
+
+
+
+
+class CreateWardMembershipView(View):
+    def get(self, request):
+        return render(request, 'create_ward_membership.html')
+
+    def post(self, request):
+        membership_id = request.POST.get('membership_id')
+        role = request.POST.get('role')
+        ward_name = request.POST.get('ward_name')
+
+        if not membership_id or not role or not ward_name:
+            messages.error(request, 'All fields are required.')
+            return render(request, 'create_ward_membership.html')
+
+        try:
+            user = UserRegistration.objects.get(membership_id=membership_id)
+        except UserRegistration.DoesNotExist:
+            messages.error(request, 'User with this membership ID does not exist.')
+            return render(request, 'create_ward_membership.html')
+
+        if user.user_status != 'approved':
+            messages.error(request, 'User is not approved yet.')
+            return render(request, 'create_ward_membership.html')
+
+        ward, created = Ward.objects.get_or_create(name=ward_name)
+        
+        try:
+            ward_membership, created = WardMembership.objects.get_or_create(
+                user=user,
+                ward=ward,
+                defaults={'membership_id': membership_id, 'role': role}
+            )
+            if not created:
+                messages.warning(request, 'This user is already a member of the ward.')
+            else:
+                messages.success(request, 'Ward membership created successfully.')
+        except IntegrityError:
+            messages.error(request, 'There was an error creating the ward membership.')
+        
+        return render(request, 'create_ward_membership.html')
 

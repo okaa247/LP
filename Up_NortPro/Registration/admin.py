@@ -6,32 +6,55 @@ from django.apps import AppConfig
 
 @admin.register(UserRegistration)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('username', 'email', 'is_email_verified', 'phone_number', 'created_at')
-
-
-@admin.register(Ward)
-class WardAdmin(admin.ModelAdmin):
-    list_display = ('name', 'user', 'created_at', 'updated_at')
-
+    list_display = ('username', 'email', 'is_email_verified', 'membership_id', 'phone_number', 'created_at')
 
 class RegistrationConfig(AppConfig):
     name = 'registration'
 
     def ready(self):
-        from . import models  # Ensure the models (and signals) are loaded
+        from . import models  
+
+
+
+@admin.register(Ward)
+class WardAdmin(admin.ModelAdmin):
+    list_display = ('name', 'chapter_registered', 'created_at')
+
+@admin.register(WardMembership)
+class WardAdmin(admin.ModelAdmin):
+    list_display = ('user', 'role', 'ward', 'membership_id', 'created_at',)
+
+
+
+
+@admin.register(LGA)
+class LGAAdmin(admin.ModelAdmin):
+    list_display = ('name', 'created_at',)
+
+@admin.register(LGAMembership)
+class LGAAdmin(admin.ModelAdmin):
+    list_display = ('user', 'role', 'lga', 'created_at', 'updated_at')
+
+
+
+
+@admin.register(State)
+class StateAdmin(admin.ModelAdmin):
+    list_display = ('name', 'created_at')
+
+@admin.register(StateMembership)
+class StateAdmin(admin.ModelAdmin):
+    list_display = ('user', 'role', 'state', 'created_at')    
+
 
 
 @admin.register(National)
 class NationalAdmin(admin.ModelAdmin):
-    list_display = ('name', 'user', 'state', 'lga', 'ward', 'membership_status', 'created_at', 'updated_at')
+    list_display = ('name', )
     
-@admin.register(State)
-class StateAdmin(admin.ModelAdmin):
-    list_display = ('name', 'created_at', 'updated_at')
 
-@admin.register(LGA)
-class LGAAdmin(admin.ModelAdmin):
-    list_display = ('name', 'user', 'ward', 'created_at', 'updated_at')
+
+
 
 
 

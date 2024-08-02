@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Ward Membership</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+    <h2>Create Ward Membership</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="membership_id">Membership ID:</label>
+            <input type="text" class="form-control" id="membership_id" name="membership_id" required>
+        </div>
+        <div class="form-group">
+            <label for="ward_name">Ward Name:</label>
+            <input type="text" class="form-control" id="ward_name" name="ward_name" required>
+        </div>
+        <div class="form-group">
+            <label for="role">Role:</label>
+            <select class="form-control" id="role" name="role" required>
+                <option value="dormant">Dormant</option>
+                <option value="active">Active</option>
+                <option value="ward_leader">Ward Leader</option>
+                <option value="ward_secretary">Ward Secretary</option>
+                <option value="ward_treasurer">Ward Treasurer</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+    {% if messages %}
+        <div class="mt-3">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
