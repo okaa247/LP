@@ -1,0 +1,112 @@
+<div class="body body-main">
+    <p class="lead">Create an account</p>
+    {% include "messages/message.html" %}
+    <form method="post" class="form-auth-small m-t-20" action="{%url 'register' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+      <div class="form-group">
+        <input type="text" name="fullname" class="form-control round" placeholder="Your Full Names" />
+      </div>
+      <div class="form-group">
+        <input type="text" name="username" class="form-control round" placeholder="Your Usernames" />
+      </div>
+      <div class="form-group">
+        <input type="email" name="email" class="form-control round"  placeholder="Your email" />
+      </div>
+      <div class="form-group">
+        <input type="number" name="phone_number" class="form-control round" placeholder="mobile number" />
+      </div>
+      <div class="form-group">
+                        <select class="form-control round"name="state">
+                            <option value="">Select State</option>
+                            <option value="Abia">Abia</option>
+                            <option value="Adamawa">Adamawa</option>
+                            <option value="Anambra">Anambra</option>
+                            <option value="Akwa Ibom">Akwa Ibom</option>
+                            <option value="Bauchi">Bauchi</option>
+                            <option value="Bayelsa">Bayelsa</option>
+                            <option value="Benue">Benue</option>
+                            <option value="Borno">Borno</option>
+                            <option value="Cross River">Cross River</option>
+                            <option value="Delta">Delta</option>
+                            <option value="Ebonyi">Ebonyi</option>
+                            <option value="Enugu">Enugu</option>
+                            <option value="Edo">Edo</option>
+                            <option value="Ekiti">Ekiti</option>
+                            <option value="Abuja">Abuja</option>
+                            <option value="Gombe">Gombe</option>
+                            <option value="Imo">Imo</option>
+                            <option value="Jigawa">Jigawa</option>
+                            <option value="Kaduna">Kaduna</option>
+                            <option value="Kano">Kano</option>
+                            <option value="Katsina">Katsina</option>
+                            <option value="Kebbi">Kebbi</option>
+                            <option value="Kogi">Kogi</option>
+                            <option value="Kwara">Kwara</option>
+                            <option value="Lagos">Lagos</option>
+                            <option value="Nasarawa">Nasarawa</option>
+                            <option value="Niger">Niger</option>
+                            <option value="Ogun">Ogun</option>
+                            <option value="Ondo">Ondo</option>
+                            <option value="Osun">Osun</option>
+                            <option value="Oyo">Oyo</option>
+                            <option value="Plateau">Plateau</option>
+                            <option value="Rivers">Rivers</option>
+                            <option value="Sokoto">Sokoto</option>
+                            <option value="Taraba">Taraba</option>
+                            <option value="Yobe">Yobe</option>
+                            <option value="Zamfara">Zamfara</option>
+                        </select>
+      </div>
+
+      <div class="form-group">
+                         <select class="form-control round" name="lga" >
+                             <option value="">Select LGA</option>
+                             <option value="Abia">Aba</option>
+                             <option value="Adamawa">Umuahia</option>
+                             <option value="Anambra">Umunneochi</option>
+                             <option value="Akwa Ibom">Ngwa</option>
+                          </select>
+       </div>
+
+       <div class="form-group">
+                         <select class="form-control round" name="ward">
+                             <option value="">Ariari</option>
+                             <option value="Abia">Abay</option>
+                             <option value="Adamawa">Aba1</option>
+                             <option value="Anambra">Aba2</option>
+                             <option value="Akwa Ibom">Aba3</option>
+                          </select>
+       </div>
+
+       <div class="form-group">
+                         <select class="state-ward form-control round" name="pollingunit">
+                             <option value="">Isi Gate</option>
+                             <option value="Abia">PHC Road</option>
+                             <option value="Adamawa">Transformer</option>
+                             <option value="Anambra">Stadium</option>
+                             <option value="Akwa Ibom">Main market</option>
+                          </select>
+       </div>
+
+      <div class="form-group">
+        <input type="file" class="form-control round" name="userimage" placeholder="Upload passport or selfie" />
+      </div>
+
+      <div class="form-group" >
+        <input type="password" class="form-control round form-control-user" id="password" name="password" placeholder="Password" >
+      </div>
+      <div class="form-group" >
+        <input type="password" class="form-control round form-control-user" id="confirm_password" name="confirm_password" placeholder="Confirm Password" >
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-round btn-block">Register</button>
+    </form>
+
+</div>
+
+
+
+{% comment %} above is just a sample of my template, it is user registration form. the user will fill the fields, 
+select a state among the options, each state has many lga under it and each lga has many ward under it 
+and as well each ward has many pollingunit under it. kindly help with corresponding javascript and Json files 
+to help simplify the code and be able to capture all the data and make the registration process easy  {% endcomment %}

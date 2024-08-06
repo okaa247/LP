@@ -1,0 +1,136 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <!-- Mirrored from nsdbytes.com/template/qubes/light/page-register.html by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 25 Jun 2024 18:49:02 GMT -->
+  <head>
+    <title>ACG | Sign Up</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport"content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description"  content="Qubes Bootstrap 4x admin is super flexible, powerful, clean &amp; modern responsive admin dashboard with unlimited possibilities." />
+    <meta name="author" content="GetBootstrap, design by: puffintheme.com" />
+    <link rel="icon" href="favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="{% static '/assets/vendor/bootstrap/css/bootstrap.min.css' %}" />
+    <link rel="stylesheet" href="{% static '/assets/vendor/font-awesome/css/font-awesome.min.css' %}" />
+    <link rel="stylesheet" href="{% static '/assets/vendor/animate-css/vivify.min.css' %}" />
+
+    <script
+      src="https://kit.fontawesome.com/3d02cf7ada.js"
+      crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="{% static '/qubes/light/assets/css/unboarding.css' %}" />
+  </head>
+  <body >
+    <div class="auth-main ">
+      <div class="auth_div ">
+        
+        <div class="card">
+          <div class="auth_brand log-reg">
+            <a class="navbar-brand" href="javascript:void(0);">
+              <img style="width: 60px" src="{% static '/image/logo-removebg-preview.png' %}" alt=""/>
+              <img style="width: 50px" src="{% static '/image/ACG-removebg-preview(1).png' %}" alt=""/></a>
+          </div>
+          <div class="body body-main">
+            <p class="lead">Complete Your Registration</p>
+            {% include "messages/message.html" %}
+
+            <form method="post" class="form-auth-small m-t-20" action="{%url 'register' %}" enctype="multipart/form-data">
+              {% csrf_token %}
+              <div class="form-group">
+                <input type="text" name="fullname" class="form-control round" placeholder="Your Full Names" />
+              </div>
+              <div class="form-group">
+                <input type="email" name="email" class="form-control round" value="{{user.email}}" placeholder="Your email" />
+              </div>
+              <div class="form-group">
+                <input type="number" name="phone_number" class="form-control round" placeholder="mobile number" />
+              </div>
+              <div class="form-group">                 
+               <select class="form-control round" name="state" id="stateSelect" onchange="populateLGAs()">
+                                  <option value="">Select State</option>
+                                </select>
+              </div>
+              <div class="form-group">
+                                <select class="form-control round" name="lga" id="lgaSelect" onchange="populateWards()">
+                                  <option value="">Select LGA</option>
+                                </select>
+              </div>
+
+              <div class="form-group">
+               <select class="form-control round" name="ward" id="wardSelect" onchange="populatePollingUnits()">
+                <option value="">Select Ward</option>
+               </select>
+              </div>
+
+              <div class="form-group">
+               <select class=" form-control round" name="pollingunit" id="pollingUnitSelect">
+                <option value="">Select Polling Unit</option>
+               </select>
+              </div>
+
+              <div class="form-group">
+                <input type="file" class="form-control round" name="userimage" placeholder="Upload passport or selfie" />
+              </div>
+                
+                <div class="form-group" >
+                  <input type="password" class="form-control round form-control-user" id="password" name="password" placeholder="Password" >
+                </div>
+                <div class="form-group" >
+                  <input type="password" class="form-control round form-control-user" id="confirm_password" name="confirm_password" placeholder="Confirm Password" >
+                </div>
+              <button type="submit" class="btn btn-primary btn-round btn-block">Register</button>
+              
+            </form>
+           
+          </div> 
+        </div>
+      </div>
+
+    </div>
+    </div>
+    <script src="{% static '/assets/vendor/jquery/jquery-3.3.1.min.js' %}"></script>
+    <script src="{% static '/assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static '/assets/bundles/vendorscripts.bundle.js' %}"></script>
+    <!-- <script src="assets/js/common.js"></script> -->
+    <!-- <script src="assets/js/lga_select.js"></script> -->
+    <script src="{% static '/qubes/light/assets/js/select_state.js' %}"></script>
+
+
+
+    <!-- <script>
+      (function () {
+        function c() {
+          var b = a.contentDocument || a.contentWindow.document;
+          if (b) {
+            var d = b.createElement('script');
+            d.innerHTML =
+              "window.__CF$cv$params={r:'899721e2aec66ec1',t:'MTcxOTM0MTMxMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='../../../cdn-cgi/challenge-platform/h/b/scripts/jsd/c7e29c8c8b6e/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
+            b.getElementsByTagName('head')[0].appendChild(d);
+          }
+        }
+        if (document.body) {
+          var a = document.createElement('iframe');
+          a.height = 1;
+          a.width = 1;
+          a.style.position = 'absolute';
+          a.style.top = 0;
+          a.style.left = 0;
+          a.style.border = 'none';
+          a.style.visibility = 'hidden';
+          document.body.appendChild(a);
+          if ('loading' !== document.readyState) c();
+          else if (window.addEventListener)
+            document.addEventListener('DOMContentLoaded', c);
+          else {
+            var e = document.onreadystatechange || function () {};
+            document.onreadystatechange = function (b) {
+              e(b);
+              'loading' !== document.readyState &&
+                ((document.onreadystatechange = e), c());
+            };
+          }
+        }
+      })();
+    </script> -->
+  </body>
+</html>

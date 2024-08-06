@@ -132,6 +132,7 @@ def create_ward_membership(sender, instance, created, **kwargs):
 class LGA(models.Model):
     name = models.CharField(max_length=100)
     wards = models.ManyToManyField(Ward)
+    # population = models.IntegerField(null=True)
     created_at = models.DateTimeField(default=timezone.now)
 
 class LGAMembership(models.Model):

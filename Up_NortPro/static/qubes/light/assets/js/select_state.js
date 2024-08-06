@@ -1,6 +1,8 @@
  // Here is the Function to fetch JSON data from file
  async function fetchJSON() {
-    const response = await fetch('/qubes/light/assets/js/data.json');
+  const response = await fetch('/static/qubes/light/assets/js/data.json');
+    // const response = await fetch('/qubes/light/assets/js/data.json');
+    // const response = await fetch("{% static 'qubes/light/assets/js/data.json' %}");
     const data = await response.json();
     return data;
   }
@@ -105,3 +107,30 @@
 
   // Populate states dropdown on page load
   populateStates();
+
+
+
+
+  // async function fetchJSON() {
+  //   const response = await fetch('/static/qubes/light/assets/js/data.json');
+  //   const data = await response.json();
+  //   return data;
+  // }
+  
+  // async function populateStates() {
+  //   const data = await fetchJSON();
+  //   const stateSelect = document.getElementById('stateSelect');
+  //   stateSelect.innerHTML = '<option value="">Select State</option>';
+  
+  //   data.forEach(stateObj => {
+  //     const option = document.createElement('option');
+  //     option.value = stateObj.state;
+  //     option.textContent = stateObj.state.toUpperCase();
+  //     stateSelect.appendChild(option);
+  //   });
+  // }
+  
+  // document.addEventListener('DOMContentLoaded', () => {
+  //   populateStates();
+  // });
+  

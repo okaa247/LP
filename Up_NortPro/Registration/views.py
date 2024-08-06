@@ -32,14 +32,13 @@ User = get_user_model()
 
 
 
-
 class Signup(View):
     def get(self, request):
         return render(request, 'user/signup.html')
 
     def post(self, request):
-        email = request.POST['email']
-        username = request.POST['username']
+        email = request.POST.get('email')
+        username = request.POST.get('username')
         
         if User.objects.filter(email=email).exists():
             messages.error(request, 'Email already exists')
@@ -69,9 +68,10 @@ class Signup(View):
 
 
 
+
 class Verify(View):
     def get(self, request):
-        return render(request, 'user/verify.html')
+        return render(request, 'user/emailverify.html')
     
     def post(self, request):
         entered_otp = request.POST.get('otp')
@@ -138,7 +138,7 @@ class Register(View):
         if not request.user.is_authenticated:
             messages.error(request, 'User not authenticated')
             return redirect('reverify')
-        return render(request, 'user/page-register2.html')
+        return render(request, 'user/register.html')
     
     def post(self, request):
         if not request.user.is_authenticated:
@@ -148,7 +148,7 @@ class Register(View):
         # Retrieve the logged-in user 
         user = request.user
         # Retrieve the username entered in the form
-        entered_username = request.POST.get('username')
+        # entered_username = request.POST.get('username')
         entered_email = request.POST.get('email')
 
         fullname = request.POST.get('fullname')
@@ -165,9 +165,9 @@ class Register(View):
             messages.error(request, 'email_mismatch')
             return redirect('register')
         
-        if entered_username != request.user.username:
-            messages.error(request, 'username_mismatch')
-            return redirect('register')
+        # if entered_username != request.user.username:
+        #     messages.error(request, 'username_mismatch')
+        #     return redirect('register')
 
         
         if password and confirm_password:
@@ -197,9 +197,10 @@ class Register(View):
 
 
 
+
 class LoginView(View):
     def get(self, request):
-        return render(request, 'login.html')
+        return render(request, 'user/login.html')
 
     def post(self, request):
         email = request.POST.get('email')
@@ -210,7 +211,7 @@ class LoginView(View):
             login(request, user)
             return redirect('home')  # Redirect to a success page or home
         else:
-            return render(request, 'login.html', {'error': 'Invalid credentials'})
+            return render(request, 'user/login.html', {'error': 'Invalid credentials'})
 
 
 
@@ -222,6 +223,10 @@ class Home(View):
 
 
 
+class State(View):
+    def get(self, request):
+  
+        return render(request, 'state.html',)
 
 
 
