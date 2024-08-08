@@ -1,7 +1,6 @@
 from django.views.generic import View
 from django.shortcuts import render
 from django.urls import reverse_lazy
-from django.views.generic.edit import CreateView
 from django.contrib.auth import get_user_model
 from .models import *
 from django.shortcuts import render, redirect, get_object_or_404
@@ -22,12 +21,10 @@ from datetime import timedelta
 from django.db.utils import IntegrityError
 from django.http import JsonResponse
 
-
 from django.db import transaction, IntegrityError
 from .models import Ward, UserRegistration as User
 
 User = get_user_model()
-
 
 
 
@@ -189,6 +186,21 @@ class Register(View):
         user.pollingunit = pollingunit
         user.userimage = userimage
         user.save()
+        
+        pollingunit, created = PollingUnit.objects.get_or_create(name=pollingunit)
+        ward, created = Ward.objects.get_or_create(name=ward)
+        ward.pollingunit.add(pollingunit)
+
+        lga, created = LGA.objects.get_or_create(name=lga)
+        lga.wards.add(ward)
+
+        # state, created = State.objects.get_or_create(name=state)
+        # state.lgas.add(lga)
+        # state.save()
+
+        state, created = State.objects.get_or_create(name=state)
+        state.lgas.add(lga)
+
 
         messages.success(request, 'Registration successfully')
         return redirect('login')
@@ -225,6 +237,11 @@ class Home(View):
 
 class State(View):
     def get(self, request):
+  
+        return render(request, 'state.html',)
+    
+    def get(self, request):
+        
   
         return render(request, 'state.html',)
 

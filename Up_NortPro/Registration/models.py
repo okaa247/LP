@@ -34,14 +34,14 @@ class UserRegistration(AbstractUser):
 
     groups = models.ManyToManyField(
         Group,
-        related_name='user_registration_set',  # Add related_name to avoid conflict
+        related_name='user_registration_set',
         blank=True,
         help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.',
         verbose_name='groups',
     )
     user_permissions = models.ManyToManyField(
         Permission,
-        related_name='user_registration_set',  # Add related_name to avoid conflict
+        related_name='user_registration_set',
         blank=True,
         help_text='Specific permissions for this user.',
         verbose_name='user permissions',
@@ -53,11 +53,17 @@ class UserRegistration(AbstractUser):
         return self.email
 
 
-
+class PollingUnit(models.Model):
+    name = models.CharField(max_length=100, null=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    
+    def __str__(self):
+        return self.name
 
 
 class Ward(models.Model):
     name = models.CharField(max_length=100, null=True)
+    pollingunit = models.ManyToManyField(PollingUnit)
     chapter_registered = models.BooleanField(default=False)
     created_at = models.DateTimeField(default=timezone.now)
     members = models.ManyToManyField(UserRegistration, through='WardMembership', related_name='myward')
@@ -86,6 +92,30 @@ class WardMembership(models.Model):
         return f'{self.user} - {self.ward} - {self.role}'
 
 
+# @receiver(post_save, sender=UserRegistration)
+# def create_ward_and_pollingunit(sender, instance, created, **kwargs):
+#     if created:
+#         pollingunit = None
+#         ward = None
+
+#         if instance.pollingunit:
+#             pollingunit, _ = PollingUnit.objects.get_or_create(name=instance.pollingunit)
+
+#         if instance.ward:
+#             ward, _ = Ward.objects.get_or_create(name=instance.ward)
+#             if pollingunit:
+#                 ward.pollingunit.add(pollingunit)
+
+#         # If there is a polling unit or ward that needs to be associated with the user,
+#         # Update the instance's fields if needed
+#         if pollingunit:
+#             instance.pollingunit = pollingunit.name
+#         if ward:
+#             instance.ward = ward.name
+
+#         instance.save(update_fields=['pollingunit', 'ward'])
+
+
 @receiver(post_save, sender=UserRegistration)
 def create_ward_membership(sender, instance, created, **kwargs):
     if instance.user_status == 'approved':
@@ -94,37 +124,6 @@ def create_ward_membership(sender, instance, created, **kwargs):
             membership_id=instance.membership_id,
             defaults={'ward': Ward.objects.first()}  # Adjust as necessary
         )
-
-
-
-# class Ward(models.Model):
-#     user = models.ForeignKey(UserRegistration, on_delete=models.CASCADE, related_name='wards')
-#     fullname = models.CharField(max_length=200, blank=True, null=True)
-#     membership_id = models.CharField(max_length=20, blank=True, null=True)
-#     created_at = models.DateTimeField(default=timezone.now)
-#     updated_at = models.DateTimeField(auto_now=True)
-#     ROLE_CHOICES = [
-#         ('dormant', 'Dormant'),
-#         ('active', 'Active'),
-#         ('ward_leader', 'Ward Leader'),
-#         ('ward_secretary', 'Ward Secretary'),
-#         ('ward_treasurer', 'Ward Treasurer'),
-#     ]
-#     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='dormant')
-
-#     def __str__(self):
-#         return self.role
-
-#     def save(self, *args, **kwargs):
-#         if self.membership_id:
-#             try:
-#                 user = UserRegistration.objects.get(membership_id=self.membership_id)
-#                 self.user = user
-#                 self.fullname = user.fullname
-#             except UserRegistration.DoesNotExist:
-#                 raise ValueError("User with this membership ID does not exist")
-#         super().save(*args, **kwargs)
-
 
 
 

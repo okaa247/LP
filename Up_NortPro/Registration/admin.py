@@ -16,6 +16,11 @@ class RegistrationConfig(AppConfig):
 
 
 
+@admin.register(PollingUnit)
+class WardAdmin(admin.ModelAdmin):
+    list_display = ('name', 'created_at')
+
+
 @admin.register(Ward)
 class WardAdmin(admin.ModelAdmin):
     list_display = ('name', 'chapter_registered', 'created_at')
