@@ -1,0 +1,87 @@
+
+<h2>Pending Status Memebers</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Full Name</th>
+            <th>Email</th>
+            <th>Phone Number</th>
+            <th>Polling Unit</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for member in ward_pending_status_list %}
+        <tr>
+            <td>{{ member.fullname }}</td>
+            <td>{{ member.email }}</td>
+            <td>{{ member.phone_number }}</td>
+            <td>{{ member.pollingunit }}</td>
+            <td>{{ member.user_status }}</td>
+            <td>
+                <form method="post" action="{% url 'ward_members' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="user_id" value="{{ member.id }}">
+                    <select name="user_status">
+                        <option value="approved" {% if member.user_status == 'approved' %}selected{% endif %}>Approved</option>
+                        <option value="pending" {% if member.user_status == 'pending' %}selected{% endif %}>Pending</option>
+                    </select>
+                    <button type="submit">Update Status</button>
+                </form>
+            </td>
+            <hr>
+    
+        </tr>
+        {% empty %}
+        <h3>No pending status members found in your ward.</h3>
+
+        {% endfor %}
+    </tbody>
+    
+</table>
+
+
+
+
+
+
+
+
+{% comment %} 
+
+
+
+<h2>Members of {{ ward.name }} Ward</h2>
+
+<ul>
+    {% for member in ward_members %}
+    <li>
+        <strong>Name:</strong> {{ member.fullname }}<br>
+        <strong>Email:</strong> {{ member.email }}<br>
+        <strong>Phone Number:</strong> {{ member.phone_number }}<br>
+        <strong>Status:</strong> {{ member.user_status }}<br>
+        <strong>Polling Unit:</strong> {{ member.pollingunit }}
+        
+        <form method="post" action="{% url 'ward_members' %}">
+            {% csrf_token %}
+            <input type="hidden" name="user_id" value="{{ member.id }}">
+            <label for="new_status">Change Status:</label>
+            <select name="new_status" id="new_status">
+                <option value="approved" {% if member.user_status == 'approved' %}selected{% endif %}>Approved</option>
+                <option value="pending" {% if member.user_status == 'pending' %}selected{% endif %}>Pending</option>
+            </select>
+            <button type="submit">Update</button>
+        </form>
+    </li>
+    <hr>
+    {% empty %}
+    <li>No members found in this ward.</li>
+    {% endfor %}
+</ul>
+
+
+
+
+
+ {% endcomment %}

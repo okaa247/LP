@@ -198,10 +198,6 @@ class Register(View):
         # state.lgas.add(lga)
         # state.save()
 
-        state, created = State.objects.get_or_create(name=state)
-        state.lgas.add(lga)
-
-
         messages.success(request, 'Registration successfully')
         return redirect('login')
 
@@ -238,12 +234,12 @@ class Home(View):
 class State(View):
     def get(self, request):
   
-        return render(request, 'state.html',)
+        return render(request, 'state/abia_state.html',)
     
     def get(self, request):
         
   
-        return render(request, 'state.html',)
+        return render(request, 'state/abia_state.html',)
 
 
 

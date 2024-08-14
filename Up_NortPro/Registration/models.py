@@ -92,28 +92,7 @@ class WardMembership(models.Model):
         return f'{self.user} - {self.ward} - {self.role}'
 
 
-# @receiver(post_save, sender=UserRegistration)
-# def create_ward_and_pollingunit(sender, instance, created, **kwargs):
-#     if created:
-#         pollingunit = None
-#         ward = None
 
-#         if instance.pollingunit:
-#             pollingunit, _ = PollingUnit.objects.get_or_create(name=instance.pollingunit)
-
-#         if instance.ward:
-#             ward, _ = Ward.objects.get_or_create(name=instance.ward)
-#             if pollingunit:
-#                 ward.pollingunit.add(pollingunit)
-
-#         # If there is a polling unit or ward that needs to be associated with the user,
-#         # Update the instance's fields if needed
-#         if pollingunit:
-#             instance.pollingunit = pollingunit.name
-#         if ward:
-#             instance.ward = ward.name
-
-#         instance.save(update_fields=['pollingunit', 'ward'])
 
 
 @receiver(post_save, sender=UserRegistration)

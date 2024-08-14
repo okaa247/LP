@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Filter Users</title>
+    {% comment %} <link rel="stylesheet" href="{% static 'path/to/your/css/file.css' %}"> {% endcomment %}
+</head>
+<body>
+    <h1>Filter Users by Ward and Polling Unit</h1>
+    
+    <!-- Filter Form -->
+    <form method="GET" action="{% url 'filter_users' %}">
+        {% csrf_token %}
+        <label for="ward">Select Ward:</label>
+        <select name="ward" id="ward">
+            {% for ward in wards %}
+            <option value="">All Wards</option>
+           
+                <option value="{{ ward.id }}">{{ ward.name }}</option>
+            {% endfor %}
+        </select>
+        <!-- <input type="text" name="ward" placeholder="ward"> -->
+
+        <label for="pollingunit">Select Polling Unit:</label>
+        <select name="pollingunit" id="pollingunit">
+            <option value="">All Polling Units</option>
+            {% for polling_unit in polling_units %}
+                <option value="{{ polling_unit.id }}">{{ polling_unit.name }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Filter</button>
+    </form>
+
+    <h2>Filtered Users</h2>
+    <ul>
+        {% for user in users %}
+            <li>{{ user.fullname }} ({{ user.email }}) - ({{ user.ward }})</li>
+        {% empty %}
+            <li>No users found.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
