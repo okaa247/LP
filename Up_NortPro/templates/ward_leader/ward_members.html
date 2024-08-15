@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ward Members</title>
+</head>
+<body>
+    <h2>Members of {{ user_ward.name }} Ward</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Full Name</th>
+                    <th>Email</th>
+                    <th>Phone Number</th>
+                    <th>Membership ID</th>
+                    <th>Role</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for member in ward_members %}
+                    <tr>
+                        <td>{{ member.user.fullname }}</td>
+                        <td>{{ member.user.email }}</td>
+                        <td>{{ member.user.phone_number }}</td>
+                        <td>{{ member.user.membership_id }}</td>
+                        <td>
+                            <select name="role_{{ member.id }}">
+                                <option value="dormant" {% if member.role == 'dormant' %}selected{% endif %}>Dormant</option>
+                                <option value="active" {% if member.role == 'active' %}selected{% endif %}>Active</option>
+                                <option value="ward_leader" {% if member.role == 'ward_leader' %}selected{% endif %}>Ward Leader</option>
+                                <option value="ward_secretary" {% if member.role == 'ward_secretary' %}selected{% endif %}>Ward Secretary</option>
+                                <option value="ward_treasurer" {% if member.role == 'ward_treasurer' %}selected{% endif %}>Ward Treasurer</option>
+                            </select>
+                        </td>
+                        <td><button type="submit">Update</button></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </form>
+
+</body>
+</html>

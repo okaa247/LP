@@ -6,23 +6,26 @@ from django.contrib import messages
 from django.utils.decorators import method_decorator
 from django.views import View
 from Registration.models import *
+from functools import wraps
 
 # Create your views here.
 
 
 
-# Decorator to check if the user has the ward_leader role
+
 def ward_leader_required(view_func):
-    def wrapper(request, *args, **kwargs):
+    @wraps(view_func)
+    def wrapper(self, request, *args, **kwargs):
         user = request.user
         try:
             # Check if the user is a ward_leader
             membership = WardMembership.objects.get(user=user, role='ward_leader')
         except WardMembership.DoesNotExist:
             messages.error(request, "You do not have permission to access this page.")
-            return redirect('some_safe_page')
-        return view_func(request, *args, **kwargs)
+            return redirect('home')
+        return view_func(self, request, *args, **kwargs)
     return wrapper
+
 
 
 @method_decorator([login_required, ward_leader_required], name='dispatch')
@@ -59,34 +62,36 @@ class WardPendingStatusView(LoginRequiredMixin, View):
 
 
 
-# class WardMembersView(LoginRequiredMixin, View):
-#     def get(self, request):
-#         # Get the ward associated with the logged-in user
-#         user_ward = request.user.ward
-        
-#         # Find the Ward object using the user's ward name
-#         ward = get_object_or_404(Ward, name=user_ward)
-        
-#         # Get all users associated with this ward
-#         ward_members = UserRegistration.objects.filter(myward=ward)
-        
-#         return render(request, 'user/ward_members.html', {
-#             'ward': ward,
-#             'ward_members': ward_members
-#         })
 
-#     def post(self, request):
-#         # Get the user whose status is to be updated
-#         user_id = request.POST.get('user_id')
-#         new_status = request.POST.get('new_status')
-        
-#         user = get_object_or_404(UserRegistration, id=user_id)
-#         user.user_status = new_status
-#         user.save()
-        
-#         messages.success(request, f'{user.fullname} status updated to {new_status}')
-        
-#         return redirect('ward_members')
+login_required
+ward_leader_required
+def ward_members_view(request):
+    # Get the ward associated with the logged-in user
+    user_ward_membership = get_object_or_404(WardMembership, user=request.user)
+    user_ward = user_ward_membership.ward
+
+    # Get all members of the same ward
+    ward_members = WardMembership.objects.filter(ward=user_ward)
+
+    if request.method == 'POST':
+        # Loop through each member to update their role
+        for member in ward_members:
+            role = request.POST.get(f'role_{member.id}')
+            if role and role != member.role:
+                member.role = role
+                member.save()
+                messages.success(request, f"Role updated for {member.user.fullname}")
+
+        return redirect('ward_members')
+
+    return render(request, 'ward_leader/ward_members.html', {
+        'ward_members': ward_members,
+        'user_ward': user_ward
+    })
+
+
+
+
 
 
 
