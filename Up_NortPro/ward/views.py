@@ -106,81 +106,70 @@ def ward_members_view(request):
 
 
 
-# @login_required
-# def create_polling_unit_agent(request):
-#     if request.method == "POST":
-#         user = request.user
+class PollingUnitAgentListView(View):
+    template_name = 'ward_leader/polling_unit_agent_list.html'
 
-#         if user.user_status != 'approved':
-#             return JsonResponse({'success': False, 'message': 'Your status is not approved.'})
+    def get(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            messages.error(request, "You need to be logged in to view this page.")
+            return redirect('login')  # Redirect to the login page if not authenticated
 
-#         ward = get_object_or_404(Ward, name=user.ward)
-#         polling_unit = get_object_or_404(PollingUnit, name=user.pollingunit)
+        ward = request.user.ward
+        pending_agents = PollingUnitAgent.objects.filter(ward__name=ward, agent_status='pending')
 
-#         existing_agent = PollingUnitAgent.objects.filter(user=user, polling_unit=polling_unit, ward=ward).first()
-#         if existing_agent:
-#             return JsonResponse({'success': False, 'message': 'You are already registered as an agent for this polling unit.'})
+        context = {
+            'pending_agents': pending_agents
+        }
+        return render(request, self.template_name, context)
 
-#         try:
-#             PollingUnitAgent.objects.create(
-#                 user=user,
-#                 polling_unit=polling_unit,
-#                 ward=ward,
-#                 agent_status='pending'
-#             )
-#             return JsonResponse({'success': True, 'message': 'You have been successfully registered as a Polling Unit Agent.'})
-#         except ValidationError as e:
-#             return JsonResponse({'success': False, 'message': str(e)})
+    def post(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            messages.error(request, "You need to be logged in to perform this action.")
+            return redirect('login')  # Redirect to the login page if not authenticated
 
-#     return JsonResponse({'success': False, 'message': 'Invalid request method.'})
+        agent_id = request.POST.get('agent_id')
+        action = request.POST.get('action')
+        agent = get_object_or_404(PollingUnitAgent, id=agent_id, ward__name=request.user.ward)
+
+        # Check if user has the role to approve agents
+        ward_membership = WardMembership.objects.filter(user=request.user, ward=agent.ward).first()
+        if ward_membership.role != 'ward_leader':
+            messages.error(request, "You don't have permission to approve agents.")
+            return redirect('polling_unit_agent_list')
+
+        if action == 'approve':
+            agent.agent_status = 'approved'
+            agent.save()
+            messages.success(request, "Agent status changed to approved.")
+        return redirect('polling_unit_agent_list')
 
 
 
 
 
 
+class ApprovedPollingUnitAgentsView(View):
+    template_name = 'ward_leader/approved_polling_unit_agents_list.html'
 
+    def get(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            messages.error(request, "You need to be logged in to view this page.")
+            return redirect('login')  # Redirect to the login page if not authenticated
 
+        # Get the user's ward
+        ward_name = request.user.ward
 
+        # Get all approved agents grouped by polling unit in the user's ward
+        polling_units = PollingUnit.objects.filter(ward__name=ward_name).prefetch_related('polling_unit_agents')
+        approved_agents_by_polling_unit = {
+            polling_unit: polling_unit.polling_unit_agents.filter(agent_status='approved', ward__name=ward_name)
+            for polling_unit in polling_units
+        }
 
-
-# def create_polling_unit_agent(request):
-#     if request.method == "POST":
-#         # Get the currently logged-in user
-#         user = request.user
-
-#         # Check if the user is approved
-#         if user.user_status != 'approved':
-#             messages.error(request, "Your status is not approved.")
-#             return redirect('some_page')  # Redirect to an appropriate page
-
-#         # Get the user's ward and polling unit
-#         ward = get_object_or_404(Ward, name=user.ward)
-#         polling_unit = get_object_or_404(PollingUnit, name=user.pollingunit)
-
-#         # Check if the user is already an agent
-#         existing_agent = PollingUnitAgent.objects.filter(user=user, polling_unit=polling_unit, ward=ward).first()
-#         if existing_agent:
-#             messages.info(request, "You are already registered as an agent for this polling unit.")
-#             return redirect('some_page')  # Redirect to an appropriate page
-
-#         try:
-#             # Create the PollingUnitAgent instance
-#             agent = PollingUnitAgent.objects.create(
-#                 user=user,
-#                 polling_unit=polling_unit,
-#                 ward=ward,
-#                 agent_status='pending'  # Or 'approved' if you want to auto-approve
-#             )
-#             agent.save()
-#             messages.success(request, "You have been successfully registered as a Polling Unit Agent.")
-#             return redirect('home')  # Redirect to an appropriate page
-#         except ValidationError as e:
-#             messages.error(request, str(e))
-#             return redirect('some_page')  # Redirect to an appropriate page
-
-#     return render(request, 'index.html')  # Render the form if the request method is not POST
-
+        context = {
+            'approved_agents_by_polling_unit': approved_agents_by_polling_unit
+        }
+        return render(request, self.template_name, context)
 
 
 

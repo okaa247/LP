@@ -200,26 +200,6 @@ class NationalMembership(models.Model):
 
 
 
-
-
-# class PollingUnitAgent(models.Model):
-#     user = models.ForeignKey(UserRegistration, on_delete=models.CASCADE, related_name='agent')
-#     polling_unit = models.ForeignKey(PollingUnit, on_delete=models.CASCADE, related_name='polling_unit_agents')
-#     ward = models.ForeignKey(Ward, on_delete=models.CASCADE)
-#     created_at = models.DateTimeField(default=timezone.now)
-#     AGENT_STATUS = [
-#         ('approved', 'Approved'),
-#         ('pending', 'Pending'),
-#     ]
-#     agent_status = models.CharField(max_length=20, choices=AGENT_STATUS, default='pending')
-
-#     def __str__(self):
-#         return f"{self.user.username} - {self.polling_unit.name}"
-
-
-
-
-
 class PollingUnitAgent(models.Model):
     user = models.ForeignKey(UserRegistration, on_delete=models.CASCADE, related_name='agent')
     polling_unit = models.ForeignKey(PollingUnit, on_delete=models.CASCADE, related_name='polling_unit_agents')

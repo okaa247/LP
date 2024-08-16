@@ -25,7 +25,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('Registration.urls')),
     path('wards/', include('ward.urls')),
-    # new
+    path('lgas/', include('lga.urls')),
 ]
 
 

@@ -1,0 +1,37 @@
+
+  <h2>Pending Polling Unit Agents in {{ request.user.ward }} ward</h2>
+  {% include "messages/message.html" %}
+  {% if pending_agents %}
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Polling Unit</th>
+          <th>Agent</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for agent in pending_agents %}
+          <tr>
+            <td>{{ agent.polling_unit.name }}</td>
+            <td>{{ agent.user.fullname }}</td>
+            <td>{{ agent.agent_status }}</td>
+            <td>
+              {% if agent.agent_status == 'pending' %}
+                <form method="post" action="{% url 'polling_unit_agent_list' %}">
+                  {% csrf_token %}
+                  <input type="hidden" name="agent_id" value="{{ agent.id }}">
+                  <button type="submit" name="action" value="approve" class="btn btn-success">Approve</button>
+                </form>
+              {% else %}
+                <span class="badge badge-success">Approved</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No pending agents found.</p>
+  {% endif %}

@@ -1,0 +1,30 @@
+
+  <h2>Approved Polling Unit Agents in {{ request.user.ward }}</h2>
+
+  {% for polling_unit, agents in approved_agents_by_polling_unit.items %}
+    <h3>{{ polling_unit.name }}</h3>
+    {% if agents %}
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Agent Name</th>
+            <th>Phone Number</th>
+            <th>Memebership ID</th>
+            <th>Email</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for agent in agents %}
+            <tr>
+              <td>{{ agent.user.fullname }}</td>
+              <td>{{ agent.user.phone_number }}</td>
+              <td>{{ agent.user.membership_id }}</td>
+              <td>{{ agent.user.email }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>No approved agents for this polling unit.</p>
+    {% endif %}
+  {% endfor %}

@@ -242,7 +242,7 @@ class Home(View):
 
         # Check if the user is approved
         if user.user_status != 'approved':
-            messages.error(request, "Your status is not approved.")
+            messages.error(request, "Your status is not approved yet, kindly wait for approval.")
             return redirect('home')  
 
         # Check if the user has an 'active' role in WardMembership
