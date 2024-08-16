@@ -40,9 +40,9 @@
       rel="stylesheet" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap"
-      rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+
     <script src="https://unpkg.com/embla-carousel/embla-carousel.umd.js"></script>
     <!-- Custom CSS  -->
     <link rel="stylesheet" href="{% static './style.css' %}" />
@@ -87,7 +87,7 @@
               <div class="nav-links d-none d-lg-block">
                 <ul>
                   <li>
-                    <a href="#">Home</a>
+                    <a href="{% url 'home' %}">Home</a>
                   </li>
 
                   <li>
@@ -103,12 +103,7 @@
                   </li>
 
                   <li class="ms-5">
-                    <a
-                      href="#"
-                      class="btn text-dark"
-                      style="background-color: #f8fff8; text-decoration: none"
-                      >Sign-in</a
-                    >
+                    <a href="{% url 'login' %}" class="btn text-dark" style="background-color: #f8fff8; text-decoration: none">Login-in</a>
                   </li>
 
                   <li>
@@ -126,6 +121,7 @@
               </button>
             </div>
           </nav>
+          {% include "messages/message.html" %}
           <div class="m-nav-link d-lg-none">
             <ul>
               <li>
@@ -166,11 +162,11 @@
                 and strength.
               </p>
               <div class="buttons-container">
-                <button
+                <a href="{% url 'signup' %}"><button
                   class="btn text-white btn2"
-                  style="background-color: #008a02">
+                  style="background-color: #008a02"> 
                   Become an Active Citizen
-                </button>
+                </button></a>
               </div>
             </div>
             <div class="col-4 index-img-right d-none d-lg-block">
@@ -277,11 +273,47 @@
             Please click the button below to register and fill out the form
             provided.
           </p>
+          <!-- <button
+            class="btn text-white mt-5 mb-5"  style="background-color: #008a02"> <a href="#">Become a Polling Unit Agent</a>
+            
+          </button> -->
           <button
-            class="btn text-white mt-5 mb-5"
-            style="background-color: #008a02">
-            Become a Polling Unit Agent
-          </button>
+    class="btn text-white mt-5 mb-5"
+    style="background-color: #008a02"
+    data-bs-toggle="modal"
+    data-bs-target="#agentModal">Become a Polling Unit Agent
+</button>
+<div id="responseMessage"></div>
+
+<!-- Modal -->
+<div class="modal fade" id="agentModal" tabindex="-1" aria-labelledby="agentModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="agentModalLabel">Confirm Agent Volunteering</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <section class="pb-4">
+          <div class="bg-white border rounded-5">
+            <section class="p-4 justify-content-center" style="text-align: center;">
+              <h2 style="margin: 5%!important;">Confirm You Want to Voluntee For {{ request.user.pollingunit }} Polling Unit Agent Under {{request.user.ward}} Ward.</h2>
+             
+              <form method="post" action="{% url 'home' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success btn-block mb-4" id="confirmVoteButton">Confirm</button>
+            </form>
+            
+            </section>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
         </div>
         <div class="col-12 d-md-col-6 rectangle-div">
           <img src="{% static './imgs/Rectangle 44.png' %}" alt="" />
@@ -786,8 +818,77 @@
       crossorigin="anonymous"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
 
     <script src="{% static './header.js' %}"></script>
+    <!-- <script>
+      document.getElementById('agentForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const form = e.target;
+        const formData = new FormData(form);
+        
+        fetch("{% url 'home' %}", {
+          method: "POST",
+          headers: {
+            "X-CSRFToken": formData.get('csrfmiddlewaretoken'),
+            "X-Requested-With": "XMLHttpRequest"
+          },
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          const messageDiv = document.getElementById('responseMessage');
+          if (data.success) {
+            messageDiv.classList.add('text-success');
+            messageDiv.innerText = data.message;
+            form.querySelector('button[type="submit"]').disabled = true;  // Disable the button if successful
+          } else {
+            messageDiv.classList.add('text-danger');
+            messageDiv.innerText = data.message;
+          }
+        })
+        .catch(error => console.error('Error:', error));
+      });
+    </script> -->
+
+    <script>
+      document.getElementById('agentForm').addEventListener('submit', function(e) {
+          e.preventDefault();
+          
+          const form = e.target;
+          const formData = new FormData(form);
+          
+          fetch("{% url 'home' %}", {
+              method: "POST",
+              headers: {
+                  "X-CSRFToken": formData.get('csrfmiddlewaretoken'),
+                  "X-Requested-With": "XMLHttpRequest"
+              },
+              body: formData
+          })
+          .then(response => response.json())
+          .then(data => {
+              const messageDiv = document.getElementById('responseMessage');
+              if (data.success) {
+                  messageDiv.classList.add('text-success');
+                  messageDiv.innerText = data.message;
+                  form.querySelector('button[type="submit"]').disabled = true;  // Disable the button if successful
+                  
+                  // Redirect to home page after 3 seconds
+                  setTimeout(() => {
+                      window.location.href = "{% url 'home' %}";
+                  }, 3000);
+              } else {
+                  messageDiv.classList.add('text-danger');
+                  messageDiv.innerText = data.message;
+              }
+          })
+          .catch(error => console.error('Error:', error));
+      });
+  </script>
+  
+
   </body>
   {% endblock content %}
 </html>

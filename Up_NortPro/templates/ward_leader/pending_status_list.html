@@ -20,7 +20,7 @@
             <td>{{ member.pollingunit }}</td>
             <td>{{ member.user_status }}</td>
             <td>
-                <form method="post" action="{% url 'ward_members' %}">
+                <form method="post" action="{% url 'pending_status' %}">
                     {% csrf_token %}
                     <input type="hidden" name="user_id" value="{{ member.id }}">
                     <select name="user_status">

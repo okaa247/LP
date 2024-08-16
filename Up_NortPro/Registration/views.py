@@ -94,6 +94,7 @@ class Verify(View):
 
 
 
+
 class ReverifyOtp(View):
     def get(self, request):
         return render(request, 'user/reverify-otp.html')
@@ -223,11 +224,67 @@ class LoginView(View):
 
 
 
-class Home(View):
-    def get(self, request):
-  
-        return render(request, 'index.html',)
+
     
+
+
+
+class Home(View):
+    template_name = 'index.html'  # Template to render for GET requests
+
+    def post(self, request, *args, **kwargs):
+        # Check if the user is authenticated
+        if not request.user.is_authenticated:
+            messages.error(request, "You need to log in to perform this action.")
+            return redirect('login')  # Redirect to the login page
+
+        user = request.user
+
+        # Check if the user is approved
+        if user.user_status != 'approved':
+            messages.error(request, "Your status is not approved.")
+            return redirect('home')  
+
+        # Check if the user has an 'active' role in WardMembership
+        active_membership = WardMembership.objects.filter(user=user, role='active').first()
+        if not active_membership:
+            messages.error(request, "You must be an active member to become a Polling Unit Agent. Kindly wait for the approval!")
+            return redirect('home')  
+
+        # Get the user's ward and polling unit
+        ward = get_object_or_404(Ward, name=user.ward)
+        polling_unit = get_object_or_404(PollingUnit, name=user.pollingunit)
+
+        # Check if the user is already an agent
+        existing_agent = PollingUnitAgent.objects.filter(user=user, polling_unit=polling_unit, ward=ward).first()
+        if existing_agent:
+            messages.info(request, "You are already registered as an agent for this polling unit.")
+            return redirect('home')  
+
+        try:
+            # Create the PollingUnitAgent instance
+            agent = PollingUnitAgent.objects.create(
+                user=user,
+                polling_unit=polling_unit,
+                ward=ward,
+                agent_status='pending'  
+            )
+            agent.save()
+            messages.success(request, "You have been successfully registered as a Polling Unit Agent.")
+            return redirect('home') 
+        except ValidationError as e:
+            messages.error(request, str(e))
+            return redirect('home') 
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name)  
+
+
+
+
+
+
+
 
 
 
@@ -240,9 +297,6 @@ class State(View):
         
   
         return render(request, 'state/abia_state.html',)
-
-
-
 
 
 
@@ -270,98 +324,11 @@ class GetUserInfo(View):
             }
         return JsonResponse(data)
 
-class CreateWard(View):
-    def get(self, request):
-        return render(request, 'ward/create_ward.html')
-
-    @transaction.atomic
-    def post(self, request):
-        role = request.POST.get('role')
-        membership_id = request.POST.get('membership_id')
-
-        if not membership_id:
-            messages.error(request, 'Name and Membership ID are required.')
-            return render(request, 'ward/create_ward.html')
-
-        try:
-            user = User.objects.get(membership_id=membership_id)
-
-            # Debugging: Print user information and input data
-            print(f"User: {user}")
-            print(f"Role: {role}, Membership ID: {membership_id}")
-
-            # Check if the user exists before creating the ward
-            if not user:
-                messages.error(request, 'User with this Membership ID does not exist.')
-                return render(request, 'ward/create_ward.html')
-
-            # Ensure data integrity with atomic transaction
-            with transaction.atomic():
-                ward = Ward.objects.create(
-                    role=role,
-                    user=user,
-                    fullname=user.fullname,
-                    membership_id=membership_id,
-                    created_at=timezone.now(),
-                    updated_at=timezone.now()
-                )
-                ward.save()
-
-            messages.success(request, 'Ward created successfully.')
-            return redirect('ward_list')
-        except User.DoesNotExist:
-            messages.error(request, 'User with this Membership ID does not exist.')
-            return render(request, 'ward/create_ward.html')
-        except IntegrityError as e:
-            messages.error(request, f'Integrity Error: {e}')
-            return render(request, 'ward/create_ward.html')
-        except Exception as e:
-            messages.error(request, f'Unexpected Error: {e}')
-            return render(request, 'ward/create_ward.html')
 
 
 
+       
 
 
-
-
-class CreateWardMembershipView(View):
-    def get(self, request):
-        return render(request, 'create_ward_membership.html')
-
-    def post(self, request):
-        membership_id = request.POST.get('membership_id')
-        role = request.POST.get('role')
-        ward_name = request.POST.get('ward_name')
-
-        if not membership_id or not role or not ward_name:
-            messages.error(request, 'All fields are required.')
-            return render(request, 'create_ward_membership.html')
-
-        try:
-            user = UserRegistration.objects.get(membership_id=membership_id)
-        except UserRegistration.DoesNotExist:
-            messages.error(request, 'User with this membership ID does not exist.')
-            return render(request, 'create_ward_membership.html')
-
-        if user.user_status != 'approved':
-            messages.error(request, 'User is not approved yet.')
-            return render(request, 'create_ward_membership.html')
-
-        ward, created = Ward.objects.get_or_create(name=ward_name)
-        
-        try:
-            ward_membership, created = WardMembership.objects.get_or_create(
-                user=user,
-                ward=ward,
-                defaults={'membership_id': membership_id, 'role': role}
-            )
-            if not created:
-                messages.warning(request, 'This user is already a member of the ward.')
-            else:
-                messages.success(request, 'Ward membership created successfully.')
-        except IntegrityError:
-            messages.error(request, 'There was an error creating the ward membership.')
-        
-        return render(request, 'create_ward_membership.html')
+      
 

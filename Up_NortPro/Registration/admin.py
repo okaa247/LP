@@ -59,6 +59,9 @@ class NationalAdmin(admin.ModelAdmin):
     
 
 
+@admin.register(PollingUnitAgent)
+class PollingUnitAgentAdmin(admin.ModelAdmin):
+    list_display = ('user', 'polling_unit', 'ward', 'agent_status', 'created_at')
 
 
 
@@ -66,27 +69,9 @@ class NationalAdmin(admin.ModelAdmin):
 
 
 
-
-
-
-
-
-# @admin.register(WardMembership)
-# class WardMembershipAdmin(admin.ModelAdmin):
-#     list_display = ('user', 'ward', 'status', 'created_at', 'updated_at')
-
-# @admin.register(Role)
-# class RoleAdmin(admin.ModelAdmin):
-#     list_display = ('role_name', 'created_at', 'updated_at')
-
-# @admin.register(UserRole)
-# class UserRoleAdmin(admin.ModelAdmin):
-#     list_display = ('user', 'role', 'level', 'level_id', 'created_at', 'updated_at')
 
 # @admin.register(PollingUnit)
 # class PollingUnitAdmin(admin.ModelAdmin):
 #     list_display = ('name', 'ward', 'created_at', 'updated_at')
 
-# @admin.register(PollingUnitAgent)
-# class PollingUnitAgentAdmin(admin.ModelAdmin):
-#     list_display = ('user', 'polling_unit', 'ward', 'created_at', 'updated_at')
+

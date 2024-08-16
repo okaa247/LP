@@ -10,11 +10,8 @@ urlpatterns = [
     path('login/', LoginView.as_view(), name='login'),
 
 
-    path('wards/create/', CreateWard.as_view(), name='create_ward'),
     path('wards/get_user_info/', GetUserInfo.as_view(), name='get_user_info'),
 
-
-    path('wards/create/', CreateWardMembershipView.as_view(), name='create-ward-membership'),
     path('state/', State.as_view(), name='state'),
 
 ]
