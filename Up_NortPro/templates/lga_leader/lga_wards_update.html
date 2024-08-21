@@ -1,0 +1,35 @@
+
+    <h2>Wards in Your LGA</h2>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Ward Name</th>
+                <th>Chapter Registered</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ward in wards %}
+                <tr>
+                    <td>{{ ward.name }}</td>
+                    <td>{{ ward.chapter_registered|yesno:"Yes,No" }}</td>
+                    <td>
+                        <form method="post" action="{% url 'lga_coordinator_view' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="ward_id" value="{{ ward.id }}">
+                            <button type="submit">
+                                {% if ward.chapter_registered %}
+                                    Mark as Not Registered
+                                {% else %}
+                                    Mark as Registered
+                                {% endif %}
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+        <h3>No pending ward to be registered in your lga.</h3>
+            {% endfor %}
+        </tbody>
+    </table>

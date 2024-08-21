@@ -7,6 +7,6 @@ urlpatterns = [
     path('agents/', PollingUnitAgentListView.as_view(), name='polling_unit_agent_list'),
     path('approved-agents/', ApprovedPollingUnitAgentsView.as_view(), name='approved_polling_unit_agents'),
 
-    
+
     # path('filter-users/', filter_users_by_ward_and_pollingunit, name='filter_users'),
 ]

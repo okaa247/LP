@@ -1,5 +1,4 @@
 from django.db import models
-from django.db import models
 from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.utils import timezone
 from shortuuidfield import ShortUUIDField
@@ -7,7 +6,6 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.exceptions import ValidationError
-from django.utils import timezone 
 
 # Create your models here.
 
@@ -100,11 +98,27 @@ class WardMembership(models.Model):
 @receiver(post_save, sender=UserRegistration)
 def create_ward_membership(sender, instance, created, **kwargs):
     if instance.user_status == 'approved':
+        # Fetch or create the Ward corresponding to the name in UserRegistration
+        ward, _ = Ward.objects.get_or_create(name=instance.ward)
+
+        # Create or get the WardMembership
         WardMembership.objects.get_or_create(
             user=instance,
             membership_id=instance.membership_id,
-            defaults={'ward': Ward.objects.first()}  # Adjust as necessary
+            defaults={'ward': ward}  # Use the ward from UserRegistration
         )
+
+
+
+
+# @receiver(post_save, sender=UserRegistration)
+# def create_ward_membership(sender, instance, created, **kwargs):
+#     if instance.user_status == 'approved':
+#         WardMembership.objects.get_or_create(
+#             user=instance,
+#             membership_id=instance.membership_id,
+#             defaults={'ward': Ward.objects.first()}  # Adjust as necessary
+#         )
 
 
 
@@ -112,8 +126,8 @@ def create_ward_membership(sender, instance, created, **kwargs):
 class LGA(models.Model):
     name = models.CharField(max_length=100)
     wards = models.ManyToManyField(Ward)
-    # population = models.IntegerField(null=True)
     created_at = models.DateTimeField(default=timezone.now)
+
 
 class LGAMembership(models.Model):
     user = models.ForeignKey(UserRegistration, on_delete=models.CASCADE, related_name='lgward', blank=True, null=True)
@@ -141,6 +155,7 @@ class State(models.Model):
     lgas = models.ManyToManyField(LGA)
     created_at = models.DateTimeField(default=timezone.now)
 
+
 class StateMembership(models.Model):
     user = models.ForeignKey(UserRegistration, on_delete=models.CASCADE, related_name='statewards', blank=True, null=True)
     state = models.ForeignKey(State, on_delete=models.CASCADE)
@@ -162,14 +177,15 @@ class StateMembership(models.Model):
 
     def __str__(self):
         return self.user.fullname
-    
-    
+
+
 
 
 
 class National(models.Model):
     name = models.CharField(max_length=100)
     states = models.ManyToManyField(State)
+
 
 class NationalMembership(models.Model):
     user = models.ForeignKey(UserRegistration, on_delete=models.CASCADE, related_name='natwards', blank=True, null=True)

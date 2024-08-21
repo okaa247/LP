@@ -30,7 +30,8 @@ def ward_leader_required(view_func):
 
 
 
-@method_decorator([login_required, ward_leader_required], name='dispatch')
+
+@method_decorator([login_required], name='dispatch')
 class WardPendingStatusView(View):
     def get(self, request):
         user = request.user
@@ -125,7 +126,7 @@ class PollingUnitAgentListView(View):
     def post(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             messages.error(request, "You need to be logged in to perform this action.")
-            return redirect('login')  # Redirect to the login page if not authenticated
+            return redirect('login') 
 
         agent_id = request.POST.get('agent_id')
         action = request.POST.get('action')

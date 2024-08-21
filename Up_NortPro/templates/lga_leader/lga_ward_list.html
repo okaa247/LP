@@ -1,0 +1,28 @@
+
+<h2>Wards in {{ user.lga }} Local Government</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Ward Name</th>
+            <th>Number of Members</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in wards_with_counts %}
+        <tr>
+            <td>{{ item.ward.name }}</td>
+            <td>{{ item.member_count }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="2">No wards found with chapter_registered=True.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h3>Total Users in LGA: {{ total_users }}</h3>
+
+
+

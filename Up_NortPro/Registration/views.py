@@ -4,18 +4,14 @@ from django.urls import reverse_lazy
 from django.contrib.auth import get_user_model
 from .models import *
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.views import View
-from django.contrib import messages
-from django.views.generic import View
 from django.shortcuts import render, redirect, HttpResponse
 from django.core.mail import send_mail
-from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 import random
 from Up_NortPro.settings import EMAIL_HOST_USER
 from django.contrib import messages, auth
-from .models import *
 from django.utils import timezone
 from datetime import timedelta
 from django.db.utils import IntegrityError
@@ -23,7 +19,7 @@ from django.http import JsonResponse
 
 from django.db import transaction, IntegrityError
 from .models import Ward, UserRegistration as User
-
+from .models import State
 User = get_user_model()
 
 
@@ -195,9 +191,18 @@ class Register(View):
         lga, created = LGA.objects.get_or_create(name=lga)
         lga.wards.add(ward)
 
-        # state, created = State.objects.get_or_create(name=state)
-        # state.lgas.add(lga)
+        # Create LGAMembership for the user
+        LGAMembership.objects.get_or_create(user=user, lga=lga, defaults={'role': 'active'})
+
+
+        state, created = State.objects.get_or_create(name=state)
+        state.lgas.add(lga)
         # state.save()
+        StateMembership.objects.get_or_create(user=user, state=state, defaults={'role': 'active'})
+
+        national, created = National.objects.get_or_create(name='Nigeria')
+        national.states.add(state)
+
 
         messages.success(request, 'Registration successfully')
         return redirect('login')
