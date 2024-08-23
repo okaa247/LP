@@ -43,7 +43,7 @@ class LGAAdmin(admin.ModelAdmin):
 
 
 
-@admin.register(State)
+@admin.register(MyState)
 class StateAdmin(admin.ModelAdmin):
     list_display = ('name', 'created_at')
 
@@ -56,7 +56,11 @@ class StateAdmin(admin.ModelAdmin):
 @admin.register(National)
 class NationalAdmin(admin.ModelAdmin):
     list_display = ('name', )
-    
+
+
+@admin.register(NationalMembership)
+class NationalAdmin(admin.ModelAdmin):
+    list_display = ('user', 'role', )
 
 
 @admin.register(PollingUnitAgent)

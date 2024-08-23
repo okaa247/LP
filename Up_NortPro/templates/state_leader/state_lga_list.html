@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>State LGA List</title>
+</head>
+<body>
+    <h1>LGAs in {{ state_name }}</h1>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>LGA Name</th>
+                <th>Number of Users</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for lga in lgas %}
+                <tr>
+                    <td>{{ lga.name|capfirst }}</td>
+                    <td>
+                        {% for lga_count in lga_membership_counts %}
+                            {% if lga.name == lga_count.lga__name %}
+                                {{ lga_count.count }}
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <th>Total Users in State</th>
+                <th>{{ total_users_in_state }}</th>
+            </tr>
+        </tfoot>
+    </table>
+</body>
+</html>
+
+
+
+
+{% comment %}  
+ <!DOCTYPE html>
+ <html>
+ <head>
+     <title>State LGA List</title>
+ </head>
+ <body>
+     <h1>LGAs in {{ state_name }}</h1>
+ 
+     <table border="1">
+         <thead>
+             <tr>
+                 <th>LGA Name</th>
+                 <th>Number of Users</th>
+             </tr>
+         </thead>
+         <tbody>
+             {% for lga in lgas %}
+                 <tr>
+                     <td>{{ lga.name }}</td>
+                     <td>
+                         {% if lga.id in lga_membership_count_dict %}
+                             {{ lga_membership_count_dict.lga.id }}
+                         {% else %}
+                             0
+                         {% endif %}
+                     </td>
+                 </tr>
+             {% endfor %}
+         </tbody>
+         <tfoot>
+             <tr>
+                 <th>Total Users in State</th>
+                 <th>{{ total_users_in_state }}</th>
+             </tr>
+         </tfoot>
+     </table>
+ 
+     <!-- Additional Debugging Info -->
+     <h2>Debugging Information</h2>
+     <p>State: {{ state_name }}</p>
+     <p>LGAs associated with the state: </p>
+     <ul>
+         {% for lga in debug_lgas %}
+             <li>{{ lga.name }} (ID: {{ lga.id }})</li>
+         {% endfor %}
+     </ul>
+     <p>LGAMembership Counts:</p>
+     <ul>
+         {% for item in debug_lga_memberships %}
+             <li>LGA ID: {{ item.lga }} - Count: {{ item.count }}</li>
+         {% endfor %}
+     </ul>
+ </body>
+ </html>
+   {% endcomment %}

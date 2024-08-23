@@ -111,17 +111,6 @@ def create_ward_membership(sender, instance, created, **kwargs):
 
 
 
-# @receiver(post_save, sender=UserRegistration)
-# def create_ward_membership(sender, instance, created, **kwargs):
-#     if instance.user_status == 'approved':
-#         WardMembership.objects.get_or_create(
-#             user=instance,
-#             membership_id=instance.membership_id,
-#             defaults={'ward': Ward.objects.first()}  # Adjust as necessary
-#         )
-
-
-
 
 class LGA(models.Model):
     name = models.CharField(max_length=100)
@@ -150,7 +139,24 @@ class LGAMembership(models.Model):
     
 
 
-class State(models.Model):
+# @receiver(post_save, sender=WardMembership)
+# def create_lga_membership(sender, instance, created, **kwargs):
+#     if created:
+#         # Fetch the LGA corresponding to the lga name in UserRegistration
+#         lga_name = instance.user.lga
+#         if lga_name:
+#             lga, _ = LGA.objects.get_or_create(name=lga_name)
+            
+#             # Create or get the LGAMembership
+#             LGAMembership.objects.get_or_create(
+#                 user=instance.user,
+#                 lga=lga
+#             )
+
+
+
+
+class MyState(models.Model):
     name = models.CharField(max_length=100)
     lgas = models.ManyToManyField(LGA)
     created_at = models.DateTimeField(default=timezone.now)
@@ -158,7 +164,7 @@ class State(models.Model):
 
 class StateMembership(models.Model):
     user = models.ForeignKey(UserRegistration, on_delete=models.CASCADE, related_name='statewards', blank=True, null=True)
-    state = models.ForeignKey(State, on_delete=models.CASCADE)
+    state = models.ForeignKey(MyState, on_delete=models.CASCADE)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
     ROLE_CHOICES = [
@@ -184,7 +190,7 @@ class StateMembership(models.Model):
 
 class National(models.Model):
     name = models.CharField(max_length=100)
-    states = models.ManyToManyField(State)
+    states = models.ManyToManyField(MyState)
 
 
 class NationalMembership(models.Model):
@@ -212,6 +218,26 @@ class NationalMembership(models.Model):
         return self.user.fullname
 
 
+@receiver(post_save, sender=WardMembership)
+def create_lga_state_national_memberships(sender, instance, created, **kwargs):
+    if created:
+        user = instance.user
+
+        # Create or get the LGA Membership
+        lga_name = user.lga
+        if lga_name:
+            lga, _ = LGA.objects.get_or_create(name=lga_name)
+            LGAMembership.objects.get_or_create(user=user, lga=lga)
+
+        # Create or get the State Membership
+        state_name = user.state
+        if state_name:
+            state, _ = MyState.objects.get_or_create(name=state_name)
+            StateMembership.objects.get_or_create(user=user, state=state)
+
+        # Create or get the National Membership
+        national, _ = National.objects.get_or_create(name="Nigeria")  # Assuming there's a single national entity
+        NationalMembership.objects.get_or_create(user=user)
 
 
 

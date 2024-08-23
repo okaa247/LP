@@ -1,12 +1,11 @@
 from django.views.generic import View
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.contrib.auth import get_user_model
 from .models import *
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.views import View
-from django.shortcuts import render, redirect, HttpResponse
 from django.core.mail import send_mail
 from django.contrib.auth.mixins import LoginRequiredMixin
 import random
@@ -19,7 +18,6 @@ from django.http import JsonResponse
 
 from django.db import transaction, IntegrityError
 from .models import Ward, UserRegistration as User
-from .models import State
 User = get_user_model()
 
 
@@ -191,18 +189,11 @@ class Register(View):
         lga, created = LGA.objects.get_or_create(name=lga)
         lga.wards.add(ward)
 
-        # Create LGAMembership for the user
-        LGAMembership.objects.get_or_create(user=user, lga=lga, defaults={'role': 'active'})
-
-
-        state, created = State.objects.get_or_create(name=state)
+        state, created = MyState.objects.get_or_create(name=state)
         state.lgas.add(lga)
-        # state.save()
-        StateMembership.objects.get_or_create(user=user, state=state, defaults={'role': 'active'})
 
         national, created = National.objects.get_or_create(name='Nigeria')
         national.states.add(state)
-
 
         messages.success(request, 'Registration successfully')
         return redirect('login')
@@ -223,9 +214,35 @@ class LoginView(View):
         user = authenticate(request, email=email, password=password)
         if user is not None:
             login(request, user)
-            return redirect('home')  # Redirect to a success page or home
+
+            # Check if the user has a role in StateMembership that requires redirection
+            try:
+                state_membership = StateMembership.objects.get(user=user)
+                if state_membership.role in ['state_coordinator', 'state_secretary', 'state_treasurer']:
+                    return redirect('state_lga_list')  # Redirect to the LGA list view
+            except StateMembership.DoesNotExist:
+                pass  # If no state membership exists, fall through to the default behavior
+
+            return redirect('home')  # Default redirect to the home page
         else:
             return render(request, 'user/login.html', {'error': 'Invalid credentials'})
+
+
+
+# class LoginView(View):
+#     def get(self, request):
+#         return render(request, 'user/login.html')
+
+#     def post(self, request):
+#         email = request.POST.get('email')
+#         password = request.POST.get('password')
+
+#         user = authenticate(request, email=email, password=password)
+#         if user is not None:
+#             login(request, user)
+#             return redirect('home')  # Redirect to a success page or home
+#         else:
+#             return render(request, 'user/login.html', {'error': 'Invalid credentials'})
 
 
 

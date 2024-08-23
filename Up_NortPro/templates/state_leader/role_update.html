@@ -1,0 +1,54 @@
+
+  <h2>User Search and Role Update</h2>
+
+  <form method="get">
+    <input type="text" name="q" placeholder="Search by LGA, Ward, Membership ID" value="{{ query }}">
+    <button type="submit">Search</button>
+  </form>
+
+  {% if results %}
+    <table>
+      <thead>
+        <tr>
+          <th>Full Name</th>
+          <th>Email</th>
+          <th>LGA</th>
+          <th>Ward</th>
+          <th>Membership ID</th>
+          <th>Current Role</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in results %}
+          <tr>
+            <td>{{ user.fullname }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.lga }}</td>
+            <td>{{ user.ward }}</td>
+            <td>{{ user.membership_id }}</td>
+            <td>{{ user.lgward.first.role }}</td>
+            <td>
+              <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="user_id" value="{{ user.id }}">
+                <select name="new_role">
+                  <option value="active">Active</option>
+                  <option value="ward_leader">Ward Leader</option>
+                  <option value="ward_secretary">Ward Secretary</option>
+                  <option value="ward_treasurer">Ward Treasurer</option>
+                  <option value="lga_coordinator">LGA Coordinator</option>
+                  <option value="lga_secretary">LGA Secretary</option>
+                  <option value="lga_treasurer">LGA Treasurer</option>
+                </select>
+                <button type="submit">Update Role</button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No users found.</p>
+  {% endif %}
+

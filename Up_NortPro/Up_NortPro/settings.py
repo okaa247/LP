@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'Registration',
     'ward',
-    'lga'
+    'lga',
+    'state'
 ]
 
 MIDDLEWARE = [

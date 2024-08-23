@@ -1,0 +1,52 @@
+
+<h2>Search Users by LGA and Membership ID</h2>
+
+<form method="get">
+    <div>
+        <label for="lga">Select LGA:</label>
+        <select name="lga" id="lga">
+            <option value="">--Select LGA--</option>
+            {% for lga in lgas %}
+                <option value="{{ lga.id }}" {% if selected_lga and selected_lga.id == lga.id %}selected{% endif %}>{{ lga.name }}</option>
+            {% endfor %}
+        </select>
+        <label for="membership_id">Membership ID:</label>
+        <input type="text" name="membership_id" id="membership_id" value="{{ request.GET.membership_id }}">
+        <button type="submit">Search</button>
+    </div>
+</form>
+
+{% if selected_lga %}
+    <h3>Users in {{ selected_lga.name }}</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Full Name</th>
+                <th>Membership ID</th>
+                <th>Current Role</th>
+                <th>Change Role</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for lga_user in lga_users %}
+                <tr>
+                    <td>{{ lga_user.user.fullname }}</td>
+                    <td>{{ lga_user.user.membership_id }}</td>
+                    <td>{{ lga_user.role }}</td>
+                    <td>
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="membership_id" value="{{ lga_user.user.membership_id }}">
+                            <select name="new_role">
+                                {% for role, role_display in lga_user.ROLE_CHOICES %}
+                                    <option value="{{ role }}" {% if lga_user.role == role %}selected{% endif %}>{{ role_display }}</option>
+                                {% endfor %}
+                            </select>
+                            <button type="submit" name="change_role">Change Role</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endif %}

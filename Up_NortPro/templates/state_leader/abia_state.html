@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-    <title>ACG | Abia State</title>
+    <title>ACG | State</title>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <link rel="icon" href="favicon.ico" type="image/x-icon" />
@@ -610,7 +610,7 @@
                 <div class="row clearfix">
                     <div class="col-md-6 col-sm-12">
                         <!-- <h2>General LGA Records</h2> -->
-                        <h2>Abia State</h2>
+                        <h2>{{ state_name|capfirst }} State</h2>
                         <nav aria-label="breadcrumb">
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item">
@@ -618,7 +618,7 @@
                                 </li>
                                 <li class="breadcrumb-item"><a href="#">App</a></li>
                                 <li class="breadcrumb-item active" aria-current="page">
-                                    Abia LGA Records
+                                    {{ state_name|capfirst }} LGA Records
                                 </li>
                             </ol>
                         </nav>
@@ -634,7 +634,7 @@
                         <div class="card w_card3">
                             <div class="body">
                                 <div class="text-center">
-                                    <h5 class="m-t-20 mb-0">5.3M </h5>
+                                    <h5 class="m-t-20 mb-0">{{ total_users_in_state }}</h5>
                                     <p class="text-muted"> Registered Members </p>
                                     <i class="fa-regular fa-hourglass-half text-warning"></i>
                                     <h5 class="m-t-20 mb-0">125</h5>
@@ -693,132 +693,26 @@
                     <div class="col-lg-12 col-md-12">
                         <h6>LGA's</h6>
                         <small class="text-muted">All LGA's of all States</small>
-                        <h6>Abia State</h6>
+                        <h6>{{ state_name|capfirst }} State</h6>
                         <small class="text-muted">Local Government List</small>
                         <div class="table-responsive mt-3">
                             <table class="table table-hover table-custom spacing5 pb-4">
                                 <tbody>
-                                    <tr>
-                                        <td>
-                                            <a href="#">Aba North</a>
-                                        </td>
-                                        <td class="text-right">
-                                            <h6 class="font-14 mb-0"><span
-                                                    class="text-muted mr-3">Population</span>1,456,783</h6>
-                                        </td>
-                                        <td class="w50 float-right">
-
-                                            <div class="flex-fill bd-highlight">
-                                                 <small><a href=""><i class="fa-solid fa-eye" style="color: #8a0088;"></i>
-                                                     View More</a>
-                                                </small>
-                                                    
-                                            </div>
-                        </div>
-                        </td>
-                        </tr>
-
-                        <tr>
-                            <td>
-                                <a href="#">Aba South</a>
-                            </td>
-                            <td class="text-right">
-                                <h6 class="font-14 mb-0"><span class="text-muted mr-3">Population</span>2,000,346</h6>
-                            </td>
-                            <td class="w50 float-right">
-
-                                <div class="flex-fill bd-highlight">
-                                     <small><a href=""><i class="fa-solid fa-eye" style="color: #8a0088;"></i>
-                                                     View More</a>
-                                                </small>
-                                        
-                                </div>
-                    </div>
-                    </td>
-                    </tr>
-
-                    <tr>
-                        <td>
-                            <a href="#">Arochukwu</a>
-                        </td>
-                        <td class="text-right">
-                            <h6 class="font-14 mb-0"><span class="text-muted mr-3">Population</span>665,421</h6>
-                        </td>
-                        <td class="w50 float-right">
-
-                            <div class="flex-fill bd-highlight">
-                                 <small><a href=""><i class="fa-solid fa-eye" style="color: #8a0088;"></i>
-                                                     View More</a>
-                                                </small>
+                                    {% for lga in lgas %}
                                     
-                            </div>
-                </div>
-                </td>
-                </tr>
 
-                <tr>
-                    <td>
-                        <a href="#">Bende</a>
-                    </td>
-                    <td class="text-right">
-                        <h6 class="font-14 mb-0"><span class="text-muted mr-3">Population</span>633,543</h6>
-                    </td>
-                    <td class="w50 float-right">
-
-                        <div class="flex-fill bd-highlight">
-                             <small><a href=""><i class="fa-solid fa-eye" style="color: #8a0088;"></i>
-                                                     View More</a>
-                                                </small>
-                                
-                        </div>
-            </div>
-            </td>
-            </tr>
-
-            <tr>
-                <td>
-                    <a href="#">Ikwuano</a>
-                </td>
-                <td class="text-right">
-                    <h6 class="font-14 mb-0"><span class="text-muted mr-3">Population</span>1,621,789</h6>
-                </td>
-                <td class="w50 float-right">
-
-                    <div class="flex-fill bd-highlight">
-                         <small><a href=""><i class="fa-solid fa-eye" style="color: #8a0088;"></i>
-                                                     View More</a>
-                                                </small>
-                            
-                    </div>
-        </div>
-        </td>
-        </tr>
-
-        <tr>
-            <td>
-                <a href="#">Isiala-Ngwa North</a>
-            </td>
-            <td class="text-right">
-                <h6 class="font-14 mb-0"><span class="text-muted mr-3">Population</span>598,336</h6>
-            </td>
-            <td class="w50 float-right">
-
-                <div class="flex-fill bd-highlight">
-                     <small><a href=""><i class="fa-solid fa-eye" style="color: #8a0088;"></i>
-                                                     View More</a>
-                                                </small>
-                        
-                </div>
-    </div>
-    </td>
-    </tr>
+   
 
     <tr>
         <td>
-            <a href="#">Isiala-Ngwa South</a>
+            <a href="#">{{ lga.name|capfirst }}</a>
         </td>
         <td class="text-right">
-            <h6 class="font-14 mb-0"><span class="text-muted mr-3">Population</span>535,811</h6>
+            {% for lga_count in lga_membership_counts %}
+            {% if lga.name == lga_count.lga__name %}
+            <h6 class="font-14 mb-0"><span class="text-muted mr-3">Members</span>{{ lga_count.count }}</h6>
+            {% endif %}
+            {% endfor %}
         </td>
         <td class="w50 float-right">
 
@@ -832,197 +726,10 @@
         </td>
     </tr>
 
-    <tr>
-        <td>
-            <a href="#">Isuikwato</a>
-        </td>
-        <td class="text-right">
-            <h6 class="font-14 mb-0"><span class="text-muted mr-3">Population</span>504,409</h6>
-        </td>
-        <td class="w50 float-right">
 
-            <div class="flex-fill bd-highlight">
-                 <small><a href=""><i class="fa-solid fa-eye" style="color: #8a0088;"></i>
-                                                     View More</a>
-                                                </small>
-                    
-            </div>
-            </div>
-        </td>
-    </tr>
 
-    <tr>
-        <td>
-            <a href="#">Obi Nwa</a>
-        </td>
-        <td class="text-right">
-            <h6 class="font-14 mb-0"><span class="text-muted mr-3">Population</span>461,123</h6>
-        </td>
-        <td class="w50 float-right">
 
-            <div class="flex-fill bd-highlight">
-                 <small><a href=""><i class="fa-solid fa-eye" style="color: #8a0088;"></i>
-                                                     View More</a>
-                                                </small>
-                    
-            </div>
-            </div>
-        </td>
-    </tr>
-
-    <tr>
-        <td>
-            <a href="#">Ohafia</a>
-        </td>
-        <td class="text-right">
-            <h6 class="font-14 mb-0"><span class="text-muted mr-3">Population</span>428,812</h6>
-        </td>
-        <td class="w50 float-right">
-
-            <div class="flex-fill bd-highlight">
-                 <small><a href=""><i class="fa-solid fa-eye" style="color: #8a0088;"></i>
-                                                     View More</a>
-                                                </small>
-                    
-            </div>
-            </div>
-        </td>
-    </tr>
-
-    <tr>
-        <td>
-            <a href="#">Osisioma</a>
-        </td>
-        <td class="text-right">
-            <h6 class="font-14 mb-0"><span class="text-muted mr-3">Population</span>402,992</h6>
-        </td>
-        <td class="w50 float-right">
-
-            <div class="flex-fill bd-highlight">
-                 <small><a href=""><i class="fa-solid fa-eye" style="color: #8a0088;"></i>
-                                                     View More</a>
-                                                </small>
-                    
-            </div>
-            </div>
-        </td>
-    </tr>
-
-    <tr>
-        <td>
-            <a href="#">Ngwa</a>
-        </td>
-        <td class="text-right">
-            <h6 class="font-14 mb-0"><span class="text-muted mr-3">Population</span>500,576</h6>
-        </td>
-        <td class="w50 float-right">
-
-            <div class="flex-fill bd-highlight">
-                 <small><a href=""><i class="fa-solid fa-eye" style="color: #8a0088;"></i>
-                                                     View More</a>
-                                                </small>
-                    
-            </div>
-            </div>
-        </td>
-    </tr>
-
-    <tr>
-        <td>
-            <a href="#">Ugwunagbo</a>
-        </td>
-        <td class="text-right">
-            <h6 class="font-14 mb-0"><span class="text-muted mr-3">Population</span>317,980</h6>
-        </td>
-        <td class="w50 float-right">
-
-            <div class="flex-fill bd-highlight">
-                 <small><a href=""><i class="fa-solid fa-eye" style="color: #8a0088;"></i>
-                                                     View More</a>
-                                                </small>
-                    
-            </div>
-            </div>
-        </td>
-    </tr>
-
-    <tr>
-        <td>
-            <a href="#">Ukwa East</a>
-        </td>
-        <td class="text-right">
-            <h6 class="font-14 mb-0"><span class="text-muted mr-3">Population</span>313,333</h6>
-        </td>
-        <td class="w50 float-right">
-
-            <div class="flex-fill bd-highlight">
-                 <small><a href=""><i class="fa-solid fa-eye" style="color: #8a0088;"></i>
-                                                     View More</a>
-                                                </small>
-                    
-            </div>
-            </div>
-        </td>
-    </tr>
-
-    <tr>
-        <td>
-            <a href="#">Ukwa West</a>
-        </td>
-        <td class="text-right">
-            <h6 class="font-14 mb-0"><span class="text-muted mr-3">Population</span>287,958</h6>
-        </td>
-        <td class="w50 float-right">
-
-            <div class="flex-fill bd-highlight">
-                 <small><a href=""><i class="fa-solid fa-eye" style="color: #8a0088;"></i>
-                                                     View More</a>
-                                                </small>
-                    
-            </div>
-            </div>
-        </td>
-    </tr>
-
-    <tr>
-        <td>
-            <a href="#">Umuahia North</a>
-        </td>
-        <td class="text-right">
-            <h6 class="font-14 mb-0"><span class="text-muted mr-3">Population</span>241,437</h6>
-        </td>
-        <td class="w50 float-right">
-
-            <div class="flex-fill bd-highlight">
-                 <small><a href=""><i class="fa-solid fa-eye" style="color: #8a0088;"></i>
-                                                     View More</a>
-                                                </small>
-                    
-            </div>
-            </div>
-        </td>
-    </tr>
-
-    <tr>
-        <td>
-            <a href="#">Umuahia South</a>
-        </td>
-        <td class="text-right">
-            <h6 class="font-14 mb-0"><span class="text-muted mr-3">Population</span>217,661</h6>
-        </td>
-        <td class="w50 float-right">
-
-            <div class="flex-fill bd-highlight">
-                 <small><a href=""><i class="fa-solid fa-eye" style="color: #8a0088;"></i>
-                                                     View More</a>
-                                                </small>
-                    
-            </div>
-            </div>
-        </td>
-    </tr>
-
-    <tr>
+    <!-- <tr>
         <td>
             <a href="#">Umu-Neochi</a>
         </td>
@@ -1037,7 +744,8 @@
             </div>
             </div>
         </td>
-    </tr>
+    </tr> -->
+    {% endfor %}
     </tbody>
     </table>
     </div>
@@ -1051,7 +759,7 @@
 
     <script src="{% static '/assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
     <script src="{% static '/assets/bundles/vendorscripts.bundle.js' %}"></script>
-    <script src="{% static 'assets/js/common.js"></script>
+    <script src="{% static 'assets/js/common.js' %}"></script>
 
     <script>
         (function () {
