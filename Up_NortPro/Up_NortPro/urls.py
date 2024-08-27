@@ -27,6 +27,7 @@ urlpatterns = [
     path('wards/', include('ward.urls')),
     path('lgas/', include('lga.urls')),
     path('states/', include('state.urls')),
+    path('national/', include('national.urls')),
 ]
 
 

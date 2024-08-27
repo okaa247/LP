@@ -1,0 +1,62 @@
+<h2>Search Users in {{ user.state|capfirst }} and Update LGA Role</h2>
+
+  <form method="get" action="{% url 'lga_status_update' %}">
+      <div class="form-group">
+          <label for="lga">LGA:</label>
+          <select name="lga" id="lga" class="form-control">
+              <option value="">Select LGA</option>
+              {% for lga in lgas %}
+                  <option value="{{ lga.name }}" {% if lga.name == selected_lga %}selected{% endif %}>{{ lga.name }}</option>
+              {% endfor %}
+          </select>
+      </div>
+  
+      <div class="form-group">
+          <label for="membership_id">Membership ID:</label>
+          <input type="text" name="membership_id" id="membership_id" class="form-control" value="{{ membership_id }}">
+      </div>
+      <button type="submit" class="btn btn-primary">Search</button>
+  </form>
+  
+  {% if user_lga_memberships %}
+      <h3>Search Results:</h3>
+      <table class="table">
+          <thead>
+              <tr>
+                  <th>Full Name</th>
+                  <th>Email</th>
+                  <th>LGA</th>
+                  <th>Membership ID</th>
+                  <th>Role</th>
+                  <th>Actions</th>
+              </tr>
+          </thead>
+          <tbody>
+              {% for item in user_lga_memberships %}
+                  <tr>
+                      <td>{{ item.user.fullname }}</td>
+                      <td>{{ item.user.email }}</td>
+                      <td>{{ item.user.lga }}</td>
+                      <td>{{ item.user.membership_id }}</td>
+                      {% comment %} <td>{{ item.lga_membership.role }}</td> {% endcomment %}
+                      <td>
+                        
+                          <form method="post" action="{% url 'lga_status_update' %}">
+                              {% csrf_token %}
+                              <input type="hidden" name="user_id" value="{{ item.user.id }}">
+                              <select name="role" class="form-control">
+                                  {% for role_value, role_name in item.lga_membership.ROLE_CHOICES %}
+                                      <option value="{{ role_value }}" {% if role_value == item.lga_membership.role %}selected{% endif %}>{{ role_name }}</option>
+                                  {% endfor %}
+                              </select>
+                              <button type="submit" class="btn btn-success mt-2">Update Role</button>
+                          </form>
+                      </td>
+                  </tr>
+              {% endfor %}
+          </tbody>
+      </table>
+  {% else %}
+      <p>No users found.</p>
+  {% endif %}
+  

@@ -1,0 +1,27 @@
+
+<h1>LGA Overview for {{ state.name }}</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>LGA</th>
+            <th>Number of Wards</th>
+            <th>Number of Polling Units</th>
+            <th>Total Number of Users</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for data in lga_data %}
+        <tr>
+            <td>{{ data.lga.name }}</td>
+            <td>{{ data.ward_count }}</td>
+            <td>{{ data.polling_unit_count }}</td>
+            <td>{{ data.user_count }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{% url 'national_membership' %}">Back to National Overview</a>
+
+

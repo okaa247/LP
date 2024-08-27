@@ -20,7 +20,15 @@ from django.db import transaction, IntegrityError
 from .models import Ward, UserRegistration as User
 User = get_user_model()
 
-
+from django.contrib.auth import get_user_model
+from django.utils.http import urlsafe_base64_encode
+from django.utils.http import urlsafe_base64_decode
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.encoding import force_bytes
+from django.utils.encoding import force_str
+from django.core.exceptions import MultipleObjectsReturned
+from django.urls import reverse
+from django.http import JsonResponse
 
 
 class Signup(View):
@@ -229,22 +237,10 @@ class LoginView(View):
 
 
 
-# class LoginView(View):
-#     def get(self, request):
-#         return render(request, 'user/login.html')
-
-#     def post(self, request):
-#         email = request.POST.get('email')
-#         password = request.POST.get('password')
-
-#         user = authenticate(request, email=email, password=password)
-#         if user is not None:
-#             login(request, user)
-#             return redirect('home')  # Redirect to a success page or home
-#         else:
-#             return render(request, 'user/login.html', {'error': 'Invalid credentials'})
-
-
+def Logout(request):
+    logout(request)
+    messages.success(request, 'Signed out successfully')
+    return redirect('login')
 
 
     
@@ -307,44 +303,19 @@ class Home(View):
 
 
 
-
-
-
-class State(View):
-    def get(self, request):
-  
-        return render(request, 'state/abia_state.html',)
-    
-    def get(self, request):
-        
-  
-        return render(request, 'state/abia_state.html',)
-
-
-
-
-
-
-
-
-
-
-
-
-
-class GetUserInfo(View):
-    def get(self, request):
-        membership_id = request.GET.get('membership_id')
-        try:
-            user = User.objects.get(membership_id=membership_id)
-            data = {
-                'fullname': user.fullname,
-            }
-        except User.DoesNotExist:
-            data = {
-                'fullname': None,
-            }
-        return JsonResponse(data)
+# class GetUserInfo(View):
+#     def get(self, request):
+#         membership_id = request.GET.get('membership_id')
+#         try:
+#             user = User.objects.get(membership_id=membership_id)
+#             data = {
+#                 'fullname': user.fullname,
+#             }
+#         except User.DoesNotExist:
+#             data = {
+#                 'fullname': None,
+#             }
+#         return JsonResponse(data)
 
 
 
@@ -352,5 +323,107 @@ class GetUserInfo(View):
        
 
 
-      
+
+class ForgotPassword(View):
+  def get(self, request):
+    # messages.success(request, 'Proceed to reset your password')
+    return render(request, 'user/forgot-password.html')
+
+  def post(self, request):
+    email = request.POST.get('email')
+
+    if not email:
+       messages.error(request, 'Email can not be blank')
+       return redirect('forgot-password')
+    #    return JsonResponse({"email":"Email can not be blank"}, status=400)
+
+    try:
+      user = User.objects.get(email=email)
+      if not user.is_email_verified:
+        messages.error(request, 'Email not verified')
+        # return JsonResponse({"reverify":"Email not verified"}, status=400)
+        return redirect('reverify')
+    except User.DoesNotExist:
+      messages.error(request, 'User with this email address does not exist')
+    #   return JsonResponse({"signup":"User with this email address does not exist"}, status=400)
+      return redirect('signup')
+
+    # Generate a one-time use token for password reset
+    uid = urlsafe_base64_encode(force_bytes(user.pk))
+    token = default_token_generator.make_token(user)
+
+    # Construct the password reset link
+    reset_link = f"http://{request.get_host()}{reverse('reset-password', args=(uid, token))}".strip('/')
+
+    # Send the password reset link to the user's email
+    send_mail(
+      'Password Reset',
+      f'Use this link to reset your password: {reset_link}',
+      'emchadexglobal@gmail.com',
+      [email],
+      fail_silently=False,
+    )
+    messages.success(request, 'Password reset link sent!')
+    # return JsonResponse({"success": 'Password reset link sent to you mail'}, status=200)
+    return render(request, 'user/forgot-password.html')
+    
+
+
+
+
+
+class PasswordReset(View):
+    def get(self, request, uidb64, token):
+        try:
+            # Decode the user ID from base64
+            uid = force_str(urlsafe_base64_decode(uidb64))
+            # Get the user based on the decoded ID
+            user = User.objects.get(pk=uid)
+
+            # Check if the token is valid for the user
+            if default_token_generator.check_token(user, token):
+                # Render the password reset form
+                messages.success(request, 'Reset your password here')
+                # return JsonResponse({"success": 'Reset your password here'}, status=200)
+                return render(request, 'user/reset-password.html', {'validlink': True, 'uidb64': uidb64, 'token': token})
+            
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist, MultipleObjectsReturned):
+            pass
+
+        # If the link is invalid,
+        messages.error(request, 'Reset-link is used. Add your email for a new one.')
+        # return JsonResponse({"used":"Reset-link is used. Add your email for a new one."}, status=400) 
+        return render(request, 'user/forgot-password.html')
+    
+
+
+    def post(self, request, uidb64, token):
+        # Handle the form submission to set a new password
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+
+        password = request.POST.get('new_password')
+        confirm_password = request.POST.get('confirm_password')
+
+        # if not password:
+        #     return JsonResponse({"password":"Password can not be blank"}, status=400)
+        
+        # if not confirm_password:
+        #     return JsonResponse({"confirm_password":"Confirm your password"}, status=400)
+ 
+        if password != confirm_password:
+            messages.error(request, 'Passwords do not match')
+            # return JsonResponse({"missmatch":"Passwords do not match, enter again!"}, status=400)
+            return render(request, 'user/reset-password.html')
+
+        # Set the new password
+        user.set_password(password)
+        user.save()
+
+        # Redirect to the login page
+        messages.success(request, 'Password reset success!  Login')
+        # return JsonResponse({"success":"Password reset successful!  Login"}, status=200)
+        return redirect('login')
+
+
 

@@ -1,0 +1,30 @@
+
+<h1>National Membership Overview</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>State</th>
+            <th>Number of LGAs</th>
+            <th>Number of Wards</th>
+            <th>Number of Polling Units</th>
+            <th>Total Number of Users</th>
+            <th>View LGAs</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for data in state_data %}
+        <tr>
+            <td>{{ data.state.name }}</td>
+            <td>{{ data.lga_count }}</td>
+            <td>{{ data.ward_count }}</td>
+            <td>{{ data.polling_unit_count }}</td>
+            <td>{{ data.user_count }}</td>
+            <td>
+                <a href="{% url 'lga_membership' state_id=data.state.id %}">View LGAs</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+

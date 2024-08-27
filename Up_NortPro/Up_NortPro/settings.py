@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'Registration',
     'ward',
     'lga',
-    'state'
+    'state',
+    'national'
 ]
 
 MIDDLEWARE = [

@@ -1,10 +1,11 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import View, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import get_object_or_404
 from django.db.models import Count, Q
 from Registration.models import *
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import UserPassesTestMixin
 
 # Create your views here.
 
@@ -49,57 +50,62 @@ class StateLGAListView(LoginRequiredMixin, TemplateView):
 
 
 
-# class StateLGAUserSearchView(LoginRequiredMixin, TemplateView):
-#     template_name = 'state_leader/state_lga_user_search.html'
 
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         user = self.request.user
+class StateUserSearchView(View):
+    def get(self, request):
+        # Ensure the user is either a state secretary, state treasurer, or state coordinator
+        state_membership = get_object_or_404(StateMembership, user=request.user, role__in=['state_secretary', 'state_treasurer', 'state_coordinator'])
 
-#         # Check if the user has the required role
-#         if user.statewards.filter(role__in=['state_coordinator', 'state_secretary', 'state_treasurer']).exists():
-#             state_membership = get_object_or_404(StateMembership, user=user)
-#             state = state_membership.state
+        # Get the wards under the state
+        state = state_membership.state
+        lgas = state.lgas.all()
 
-#             # Fetch all LGAs in the state
-#             lgas_in_state = state.lgas.all()
-#             context['lgas'] = lgas_in_state
+        # Filter users based on the LGA and membership_id if provided
+        lga = request.GET.get('lga')
+        membership_id = request.GET.get('membership_id')
+        users = UserRegistration.objects.filter(state=state.name)
 
-#             # Handle search filtering
-#             selected_lga_id = self.request.GET.get('lga')
-#             membership_id = self.request.GET.get('membership_id')
-#             lga_users = []
+        if lga:
+            users = users.filter(lga=lga)
+        if membership_id:
+            users = users.filter(membership_id=membership_id)
 
-#             if selected_lga_id:
-#                 selected_lga = get_object_or_404(LGA, id=selected_lga_id, name__in=lgas_in_state)
-#                 context['selected_lga'] = selected_lga
+        # Precompute the LGA membership for each user
+        user_lga_memberships = []
+        for user in users:
+            try:
+                lga_membership = LGAMembership.objects.filter(user=user, lga__name=user.lga).first()
+            except LGAMembership.DoesNotExist:
+                lga_membership = None
 
-#                 # Filter users by LGA and membership_id
-#                 lga_users = LGAMembership.objects.filter(lga=selected_lga)
-#                 if membership_id:
-#                     lga_users = lga_users.filter(user__membership_id__icontains=membership_id)
+            user_lga_memberships.append({
+                'user': user,
+                'lga_membership': lga_membership
+            })
 
-#             context['lga_users'] = lga_users
-#         else:
-#             messages.error(self.request, "You do not have permission to view this page.")
-#             return redirect('home')
+        context = {
+            'users': users,
+            'lgas': lgas,
+            'selected_lga': lga,
+            'membership_id': membership_id,
+            'user_lga_memberships': user_lga_memberships,
+        }
+        return render(request, 'state_leader/lga_statusupdate.html', context)
 
-#         return context
+    def post(self, request):
+        # Get the user and the new role
+        user_id = request.POST.get('user_id')
+        new_role = request.POST.get('role')
 
-#     def post(self, request, *args, **kwargs):
-#         if 'change_role' in request.POST:
-#             membership_id = request.POST.get('membership_id')
-#             new_role = request.POST.get('new_role')
+        user_to_update = get_object_or_404(UserRegistration, id=user_id)
+        lga_membership = get_object_or_404(LGAMembership, user=user_to_update, lga__name=user_to_update.lga)
 
-#             # Update the role in LGAMembership
-#             lga_membership = get_object_or_404(LGAMembership, user__membership_id=membership_id)
-#             lga_membership.role = new_role
-#             lga_membership.save()
+        # Update the role in LGAMembership
+        lga_membership.role = new_role
+        lga_membership.save()
 
-#             messages.success(request, f"Role updated successfully for {lga_membership.user.fullname}.")
-#             return redirect('state_lga_user_search')
-
-#         return super().post(request, *args, **kwargs)
+        messages.success(request, f"{user_to_update.fullname}'s role has been updated to {new_role}.")
+        return redirect('lga_status_update')
 
 
 
@@ -150,6 +156,10 @@ class UserSearchAndRoleUpdateView(LoginRequiredMixin, View):
 
         messages.success(request, f"{user.fullname}'s role has been updated to {new_role}.")
         return redirect('user_search_and_role_update')
+
+
+
+
 
 
 
