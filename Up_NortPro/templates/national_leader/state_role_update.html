@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+{% extends 'national_leader/header2.html' %}
+{% load static %}
+<html lang="en">
+  {% block content %}
+
+  <body class="theme-green">
+    <div class="overlay"></div>
+    <div id="wrapper">
+
+      {% include 'national_leader/sidebar.html' %}
+   
+  
+
+       <!-- start of sidebar -->
+      
+      <!-- end of sidebar -->
+
+      <div id="main-content">
+        <div class="block-header">
+          <div class="row clearfix">
+            <div class="col-md-6 col-sm-12">
+              <h2>Update State Membership Role</h2>
+              <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                  <li class="breadcrumb-item">
+                    <a href="#"><i class="fa fa-cube"></i></a>
+                  </li>
+                  <li class="breadcrumb-item"><a href="#">App</a></li>
+                  <li class="breadcrumb-item active" aria-current="page">
+                    Contact
+                  </li>
+                </ol>
+              </nav>
+            </div>
+            <div class="col-md-6 col-sm-12 text-right hidden-xs">
+              <a
+                href="javascript:void(0);"
+                class="btn btn-sm btn-primary btn-round"
+                title
+                >Add New</a
+              >
+            </div>
+          </div>
+        </div>
+        <div class="container-fluid">
+
+<form method="get" action="{% url 'state_membership_update' %}">
+    <div class="form-group">
+        <label for="state">State:</label>
+        <select name="state" id="state" class="form-control">
+            <option value="">Select State</option>
+            {% for state in states %}
+                <option value="{{ state.name }}" {% if state.name == selected_state %}selected{% endif %}>{{ state.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="membership_id">Membership ID:</label>
+        <input type="text" name="membership_id" id="membership_id" class="form-control" value="{{ membership_id }}">
+    </div>
+
+    <button type="submit" class="btn btn-primary">Search</button>
+</form>
+
+          <div class="row clearfix">
+            <div class="col-lg-12">
+              <div class="table-responsive">
+                {% if state_memberships %}
+                <table class="table table-hover table-custom spacing5">
+                  <tbody>
+                    {% for membership in state_memberships %}
+                    <tr>
+                      <td class="w60">
+                        <img
+                          src="{{ membership.user.userimage.url }}" data-toggle="tooltip"
+                          data-placement="top"  title alt="Avatar" class="w35 rounded" data-original-title="Avatar Name" />
+                      </td>
+                      <td>
+                        <a href="javascript:void(0);" title>{{ membership.user.fullname|title }}</a>
+                        <p class="mb-0">{{ membership.user.phone_number }}</p>
+                      </td>
+                      <td>
+                        <span>
+                         <!-- <a
+                            href="https://nsdbytes.com/cdn-cgi/l/email-protection"
+                            class="__cf_email__"
+                            data-cfemail="bcffddced3d091dfd3d7d9fcd9c4ddd1ccd0d992dfd3d1"
+                            >[email&#160;protected]</a
+                          > -->
+                            {{ membership.user.membership_id }}
+                          </span>
+                      </td>
+                      <td>
+                        <span>{{ membership.state.name|title }}</span>
+                        <!-- <span>{{ membership.role }}</span> -->
+                      </td>
+                      <td>
+                        
+                        <span>{{ membership.role|title }}</span>
+                      </td>
+                      <td>
+                        <!-- <button class="btn btn-primary btn-sm">Message</button>
+                        <button class="btn btn-danger btn-sm">Remove</button> -->
+                        <form method="post" action="{% url 'state_membership_update' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="membership_id" value="{{ membership.id }}">
+                            <div class="row">
+                            <div class="col-md-6 col-sm-6">
+                            <select name="role" class="form-control">
+                                {% for role_value, role_name in membership.ROLE_CHOICES %}
+                                    <option value="{{ role_value }}" {% if role_value == membership.role %}selected{% endif %}>{{ role_name }}</option>
+                                {% endfor %}
+                            </select>
+                            </div>
+                            <div class="col-md-6 col-sm-6">
+                            <button type="submit" class="btn btn-success mt-2">Update Role</button>
+                           </div>
+                           </div>
+                        </form>
+                        
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+                {% else %}
+                <p>No users found.</p>
+                {% endif %}
+              </div>
+              <nav aria-label="Page navigation example">
+                <ul class="pagination">
+                  <li class="page-item active">
+                    <a
+                      class="page-link"
+                      href="javascript:void(0);"
+                      aria-label="Previous">
+                      <span aria-hidden="true">«</span>
+                      <span class="sr-only">Previous</span>
+                    </a>
+                  </li>
+                  <li class="page-item active">
+                    <a class="page-link" href="javascript:void(0);">1</a>
+                  </li>
+                  <li class="page-item">
+                    <a class="page-link" href="javascript:void(0);">2</a>
+                  </li>
+                  <li class="page-item">
+                    <a class="page-link" href="javascript:void(0);">3</a>
+                  </li>
+                  <li class="page-item">
+                    <a
+                      class="page-link"
+                      href="javascript:void(0);"
+                      aria-label="Next">
+                      <span aria-hidden="true">»</span>
+                      <span class="sr-only">Next</span>
+                    </a>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </body>
+  {% endblock content %}
+</html>

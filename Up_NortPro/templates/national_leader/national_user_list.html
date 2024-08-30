@@ -1,0 +1,25 @@
+
+<h2>National and State Roles</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Phone Number</th>
+            <th>Role</th>
+            <th>State</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for membership in state_memberships %}
+            <tr>
+                <td><img src="{{ membership.user.userimage.url }}" alt="{{ membership.user.fullname }}" style="width: 50px; height: 50px;"></td>
+                <td>{{ membership.user.fullname }}</td>
+                <td>{{ membership.user.phone_number }}</td>
+                <td>{{ membership.role }}</td>
+                <td>{{ membership.state.name }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

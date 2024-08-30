@@ -9,42 +9,94 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 
 # Create your views here.
 
-
-
-
-
-class StateLGAListView(LoginRequiredMixin, TemplateView):
-    # template_name = 'state_leader/state_lga_list.html'
+class StateLGAListView(UserPassesTestMixin, TemplateView):
     template_name = 'state_leader/abia_state.html'
+
+    def test_func(self):
+        # Check if the user has the required roles
+        user = self.request.user
+        national_membership = NationalMembership.objects.filter(user=user).first()
+        state_membership = StateMembership.objects.filter(user=user).first()
+
+        if national_membership and national_membership.role in ['national_coordinator', 'national_secretary', 'national_treasurer']:
+            return True
+        elif state_membership and state_membership.role in ['state_coordinator', 'state_secretary', 'state_treasurer']:
+            return True
+        return False
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
-        
-        if user.statewards.filter(role__in=['state_coordinator', 'state_secretary', 'state_treasurer']).exists():
-            # Get the logged-in user's state
-            user_state_membership = get_object_or_404(StateMembership, user=user)
-            user_state = user_state_membership.state
 
-            # Get all LGAs in the user's state
-            lgas_in_state = user_state.lgas.all()
+         # Get the logged-in user's state
+        user_state_membership = get_object_or_404(StateMembership, user=user)
+        state = user_state_membership.state
 
-            # Calculate the number of LGAMembership for each LGA
-            lga_membership_counts = LGAMembership.objects.filter(lga__in=lgas_in_state).values('lga__name').annotate(count=Count('id'))
+        # Query all LGAs within the state
+        lgas = state.lgas.all()
 
-            # Total users in the state (sum of all LGAMembership in the state)
-            total_users_in_state = LGAMembership.objects.filter(lga__in=lgas_in_state).count()
+        # Prepare the data to display
+        lga_data = []
+        for lga in lgas:
+            wards = lga.wards.all()
+            ward_count = wards.count()
 
-            context['lgas'] = lgas_in_state
-            context['lga_membership_counts'] = lga_membership_counts
-            context['total_users_in_state'] = total_users_in_state
-            context['state_name'] = user_state.name
+            polling_unit_count = 0
+            for ward in wards:
+                polling_unit_count += ward.pollingunit.all().count()
 
-        else:
-            messages.error(self.request, 'You do not have permission to view this page.')
-            return redirect('home')
-        
+            user_count = LGAMembership.objects.filter(lga=lga).count()
+
+            lga_data.append({
+                'lga': lga,
+                'ward_count': ward_count,
+                'polling_unit_count': polling_unit_count,
+                'user_count': user_count,
+            })
+
+        # Total users in the state (sum of all LGAMembership in the state)
+        total_users_in_state = LGAMembership.objects.filter(lga__in=lgas).count()
+
+        context['state'] = state
+        context['total_users_in_state'] = total_users_in_state
+        context['lga_data'] = lga_data
         return context
+
+
+
+
+# class StateLGAListView(LoginRequiredMixin, TemplateView):
+#     # template_name = 'state_leader/state_lga_list.html'
+#     template_name = 'state_leader/abia_state.html'
+
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         user = self.request.user
+        
+#         if user.statewards.filter(role__in=['state_coordinator', 'state_secretary', 'state_treasurer']).exists():
+#             # Get the logged-in user's state
+#             user_state_membership = get_object_or_404(StateMembership, user=user)
+#             user_state = user_state_membership.state
+
+#             # Get all LGAs in the user's state
+#             lgas_in_state = user_state.lgas.all()
+
+#             # Calculate the number of LGAMembership for each LGA
+#             lga_membership_counts = LGAMembership.objects.filter(lga__in=lgas_in_state).values('lga__name').annotate(count=Count('id'))
+
+#             # Total users in the state (sum of all LGAMembership in the state)
+#             total_users_in_state = LGAMembership.objects.filter(lga__in=lgas_in_state).count()
+
+#             context['lgas'] = lgas_in_state
+#             context['lga_membership_counts'] = lga_membership_counts
+#             context['total_users_in_state'] = total_users_in_state
+#             context['state_name'] = user_state.name
+
+#         else:
+#             messages.error(self.request, 'You do not have permission to view this page.')
+#             return redirect('home')
+        
+#         return context
 
         
 

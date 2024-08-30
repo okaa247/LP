@@ -610,7 +610,7 @@
                 <div class="row clearfix">
                     <div class="col-md-6 col-sm-12">
                         <!-- <h2>General LGA Records</h2> -->
-                        <h2>{{ state_name|capfirst }} State</h2>
+                        <h2>{{ state.name|capfirst }}</h2>
                         <nav aria-label="breadcrumb">
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item">
@@ -689,20 +689,18 @@
                         </div>
                     </div>
                 </div>
-                <div class="row clearfix">
-                    <div class="col-lg-12 col-md-12">
+
+                
+        <!-- <div class="row clearfix">
+           <div class="col-lg-12 col-md-12">
                         <h6>LGA's</h6>
                         <small class="text-muted">All LGA's of all States</small>
                         <h6>{{ state_name|capfirst }} State</h6>
                         <small class="text-muted">Local Government List</small>
                         <div class="table-responsive mt-3">
-                            <table class="table table-hover table-custom spacing5 pb-4">
-                                <tbody>
-                                    {% for lga in lgas %}
-                                    
-
-   
-
+                <table class="table table-hover table-custom spacing5 pb-4">
+                 <tbody>
+                {% for lga in lgas %}
     <tr>
         <td>
             <a href="#">{{ lga.name|capfirst }}</a>
@@ -715,41 +713,58 @@
             {% endfor %}
         </td>
         <td class="w50 float-right">
-
             <div class="flex-fill bd-highlight">
-                 <small><a href=""><i class="fa-solid fa-eye" style="color: #8a0088;"></i>
-                                                     View More</a>
-                                                </small>
-                    
+                 <small><a href=""><i class="fa-solid fa-eye" style="color: #8a0088;"></i> View More</a></small>
             </div>
             </div>
         </td>
     </tr>
 
-
-
-
-    <!-- <tr>
-        <td>
-            <a href="#">Umu-Neochi</a>
-        </td>
-        <td class="text-right">
-            <h6 class="font-14 mb-0"><span class="text-muted mr-3">Population</span>209,665</h6>
-        </td>
-        <td class="w50 float-right">
-
-            <div class="flex-fill bd-highlight">
-                 <small><a href=""><i class="fa-solid fa-eye" style="color: #8a0088;"></i> View More</a> </small>
-                    
-            </div>
-            </div>
-        </td>
-    </tr> -->
     {% endfor %}
     </tbody>
     </table>
     </div>
-    </div>
+    </div> -->
+
+
+    <div class="row clearfix">
+        <div class="col-12 col-sm-12">
+          <div class="card">
+            <div class="header">
+              <h2>State Dashboards</h2>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-custom spacing5 mb-0">
+                <thead>
+                  <tr>
+                    <!-- <th>#No</th> -->
+                    <th>LGA</th>
+                    <th>Number of Wards</th>
+                    <th>Number of Polling Units</th>
+                    <th>Total Number of Members</th>
+                    <th>View Page</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for data in lga_data %}
+                  <tr>
+                    <td>{{ data.lga.name|capfirst }}</td>
+                    <td>{{ data.ward_count }}</td>
+                    <td>{{ data.polling_unit_count }}</td>
+                    <td>{{ data.user_count }}</td>
+                    <td>
+                      <a href="{% url 'ward_membership' lga_id=data.lga.id %}"><span class="badge badge-success">Visit</span></a>
+                    </td>
+                </tr>
+                {% endfor %}
+                 
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
     </div>
     </div>

@@ -1,0 +1,58 @@
+
+<h1>Ward Overview for {{ lga.name }}</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>Ward</th>
+            <th>Number of Polling Units</th>
+            <th>Total Number of Users</th>
+            <th>View Polling Units</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for data in ward_data %}
+        <tr>
+            <td>{{ data.ward.name }}</td>
+            <td>{{ data.polling_unit_count }}</td>
+            <td>{{ data.user_count }}</td>
+            <td>
+                <a href="{% url 'pollingunit_list' ward_id=data.ward.id %}">View Polling Units</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{% url 'lga_membership' state_id=state_id %}">Back to LGA Overview</a>
+
+
+
+
+
+
+
+{% comment %} 
+<h1>Ward Overview for {{ lga.name }}</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>Ward</th>
+            <th>Number of Polling Units</th>
+            <th>Total Number of Users</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for data in ward_data %}
+        <tr>
+            <td>{{ data.ward.name }}</td>
+            <td>{{ data.polling_unit_count }}</td>
+            <td>{{ data.user_count }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{% url 'lga_membership' state_id=state_id %}">Back to LGA Overview</a>
+ {% endcomment %}

@@ -223,12 +223,27 @@ class LoginView(View):
         if user is not None:
             login(request, user)
 
+            # Check if the user has a role in WardMembership that requires redirection
+            try:
+                ward_membership = WardMembership.objects.get(user=user)
+                if ward_membership.role in ['ward_leader', 'ward_secretary', 'ward_treasurer']:
+                    return redirect('ward_members')  # Redirect to the LGA list view
+            except WardMembership.DoesNotExist:
+                pass  # If no ward membership exists, fall through to the default behavior
+
             # Check if the user has a role in StateMembership that requires redirection
             try:
                 state_membership = StateMembership.objects.get(user=user)
                 if state_membership.role in ['state_coordinator', 'state_secretary', 'state_treasurer']:
                     return redirect('state_lga_list')  # Redirect to the LGA list view
             except StateMembership.DoesNotExist:
+                pass  # If no state membership exists, fall through to the default behavior
+
+            try:
+                national_membership = NationalMembership.objects.get(user=user)
+                if national_membership.role in ['national_coordinator', 'national_secretary', 'national_treasurer']:
+                    return redirect('national_membership')  # Redirect to the LGA list view
+            except NationalMembership.DoesNotExist:
                 pass  # If no state membership exists, fall through to the default behavior
 
             return redirect('home')  # Default redirect to the home page

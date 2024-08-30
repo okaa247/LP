@@ -1,0 +1,63 @@
+
+<h1>Polling Unit Overview for {{ ward.name }}</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>Polling Unit</th>
+            <th>Total Number of Users</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for data in pollingunit_data %}
+        <tr>
+            <td>{{ data.pollingunit.name }}</td>
+            <td>{{ data.user_count }}</td>
+            <td><a href="{% url 'pollingunit_users' pollingunit_name=data.pollingunit.name %}">View Users</a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{% url 'ward_membership' lga_id=ward.lga_set.first.id %}">Back to Ward Overview</a>
+
+
+
+
+
+
+
+
+{% comment %} 
+<h1>Polling Unit Overview for {{ ward.name }}</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>Polling Unit</th>
+            <th>Total Number of Users</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for data in pollingunit_data %}
+        <tr>
+            <td>{{ data.pollingunit.name }}</td>
+            <td>{{ data.user_count }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% if lga %}
+<a href="{% url 'ward_membership' lga_id=lga.id %}">Back to Ward Overview</a>
+{% else %}
+<a href="#">Back to Ward Overview</a>
+{% endif %}
+
+
+
+
+
+
+ {% endcomment %}

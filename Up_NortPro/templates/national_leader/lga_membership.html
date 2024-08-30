@@ -8,6 +8,7 @@
             <th>Number of Wards</th>
             <th>Number of Polling Units</th>
             <th>Total Number of Users</th>
+            <th>View Wards</th>
         </tr>
     </thead>
     <tbody>
@@ -17,6 +18,9 @@
             <td>{{ data.ward_count }}</td>
             <td>{{ data.polling_unit_count }}</td>
             <td>{{ data.user_count }}</td>
+            <td>
+                <a href="{% url 'ward_membership' lga_id=data.lga.id %}">View Wards</a>
+            </td>
         </tr>
         {% endfor %}
     </tbody>

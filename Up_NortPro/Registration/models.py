@@ -93,8 +93,6 @@ class WardMembership(models.Model):
 
 
 
-
-
 @receiver(post_save, sender=UserRegistration)
 def create_ward_membership(sender, instance, created, **kwargs):
     if instance.user_status == 'approved':
@@ -125,9 +123,6 @@ class LGAMembership(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     ROLE_CHOICES = [
         ('active', 'Active'),
-        ('ward_leader', 'Ward Leader'),
-        ('ward_secretary', 'Ward Secretary'),
-        ('ward_treasurer', 'Ward Treasurer'),
         ('lga_coordinator', 'LGA Coordinator'),
         ('lga_secretary', 'LGA Secretary'),
         ('lga_treasurer', 'LGA Treasurer'),
@@ -169,12 +164,6 @@ class StateMembership(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     ROLE_CHOICES = [
         ('active', 'Active'),
-        ('ward_leader', 'Ward Leader'),
-        ('ward_secretary', 'Ward Secretary'),
-        ('ward_treasurer', 'Ward Treasurer'),
-        ('lga_coordinator', 'LGA Coordinator'),
-        ('lga_secretary', 'LGA Secretary'),
-        ('lga_treasurer', 'LGA Treasurer'),
         ('state_coordinator', 'State Coordinator'),
         ('state_secretary', 'State Secretary'),
         ('state_treasurer', 'State Treasurer'),
@@ -199,15 +188,6 @@ class NationalMembership(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     ROLE_CHOICES = [
         ('active', 'Active'),
-        ('ward_leader', 'Ward Leader'),
-        ('ward_secretary', 'Ward Secretary'),
-        ('ward_treasurer', 'Ward Treasurer'),
-        ('lga_coordinator', 'LGA Coordinator'),
-        ('lga_secretary', 'LGA Secretary'),
-        ('lga_treasurer', 'LGA Treasurer'),
-        ('state_coordinator', 'State Coordinator'),
-        ('state_secretary', 'State Secretary'),
-        ('state_treasurer', 'State Treasurer'),
         ('national_coordinator', 'National Coordinator'),
         ('national_secretary', 'National Secretary'),
         ('national_treasurer', 'National Treasurer'),
